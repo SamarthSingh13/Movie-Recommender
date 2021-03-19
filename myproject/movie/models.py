@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import timedelta
 
 # Create your models here.
 class Ott(models.Model):
@@ -36,14 +37,15 @@ class Country(models.Model):
 #     def __str__(self):
 #         return self.title + " - " + self.overview + ", " + self.origin_country + ", " + self.original_language
 
+
 class Show(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
-    duration = models.DurationField()
+    duration = models.DurationField(default=timedelta())
     release_date = models.DateField()
     avg_rating = models.DecimalField(decimal_places=2, max_digits=4)
     imdb_rating = models.DecimalField(decimal_places=2, max_digits=4)
-    imdb_id = models.CharField(max_length=250)
+    #imdb_id = models.CharField(max_length=250)
     rotten_tomato = models.IntegerField()
     budget = models.BigIntegerField()
     overview = models.CharField(max_length=1000)
@@ -52,6 +54,10 @@ class Show(models.Model):
 
     def __str__(self):
         return self.title + " - " + self.overview
+
+class OriginCountry(models.Model):
+    show_id = models.ForeignKey(Show, on_delete=models.CASCADE)
+    country_id = models.ForeignKey(Country, on_delete=models.CASCADE)
 
 
 class OriginalLanguage(models.Model):
@@ -90,7 +96,7 @@ class Person(models.Model):
     name = models.CharField(max_length=250)
     dob = models.DateField()
     gender = models.CharField(max_length=10)
-    nationality = models.ForeignKey(Country, on_delete = models.CASCADE, default=1)
+    nationality = models.ForeignKey(Country, on_delete = models.CASCADE)
 
     def __str__(self):
         return self.name
