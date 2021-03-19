@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Show, Ott, Genre, Language, Country, Person, CastMember, CrewMember
+from .models import Show, Ott, Genre, Language, Country, Person, Actor, Director
 
 # Register your models here.
 admin.site.register(Show)
@@ -8,3 +8,4 @@ admin.site.register(Ott)
 admin.site.register(Language)
 admin.site.register(Genre)
 admin.site.register(Country)
+admin.site.register(Person)
