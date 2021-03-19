@@ -96,7 +96,6 @@ class Person(models.Model):
     name = models.CharField(max_length=250)
     dob = models.DateField()
     gender = models.CharField(max_length=10)
-    nationality = models.ForeignKey(Country, on_delete = models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -123,6 +122,7 @@ class User(models.Model):
     user_id = models.CharField(max_length=250)
     email = models.EmailField(max_length=250)
     password = models.CharField(max_length=250)
+    nationality = models.ForeignKey(Country, on_delete = models.CASCADE)
 
 class Rating(models.Model):
     id = models.AutoField(primary_key=True)
