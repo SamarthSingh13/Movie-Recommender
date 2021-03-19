@@ -36,10 +36,6 @@ class Country(models.Model):
 #     def __str__(self):
 #         return self.title + " - " + self.overview + ", " + self.origin_country + ", " + self.original_language
 
-class OriginalLanguage(models.Model):
-    show_id = models.ForeignKey(Show, on_delete=models.CASCADE)
-    language_id = models.ForeignKey(Language, on_delete=models.CASCADE)
-
 class Show(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
@@ -56,6 +52,11 @@ class Show(models.Model):
 
     def __str__(self):
         return self.title + " - " + self.overview
+
+
+class OriginalLanguage(models.Model):
+    show_id = models.ForeignKey(Show, on_delete=models.CASCADE)
+    language_id = models.ForeignKey(Language, on_delete=models.CASCADE)
 
 # class Episode(models.Model):
 #     id = models.AutoField(primary_key=True)
