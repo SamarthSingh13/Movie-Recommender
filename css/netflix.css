@@ -1,6 +1,6 @@
 /* CSS VARIABLES */
 :root {
-  --primary: #141414;
+  --primary: #3b7a57 ;
   --light: #F3F3F3;
   --dark: 	#686868;
 }
@@ -43,10 +43,11 @@ header {
   grid-gap:5px;
   grid-template-columns: 1fr 4fr 1fr;
   grid-template-areas: 
-   "nt mn mn sb . . . "; 
+   "mn mn . . . sb . . . "; 
   background-color: var(--primary);
   width: 100%;
-  margin-bottom: 0px;  
+  margin-bottom: 0px; 
+  /*margin-left: 0px; */
 }
 
 .netflixLogo {
@@ -73,6 +74,7 @@ header {
 .main-nav {
   grid-area: mn;
   padding: 0 30px 0 20px;
+  /*margin-left: 0px;*/
 }
 
 .main-nav a {
@@ -114,6 +116,7 @@ header {
 
 .box a {
   transition: transform .3s;  
+  margin-left: 10px;
 }
 
 .box a:hover {
