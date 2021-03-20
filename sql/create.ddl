@@ -153,3 +153,18 @@ CREATE TABLE mru (
   FOREIGN KEY(userp_id) references userp(person_id),
   FOREIGN KEY(rating_id) references rating(id)
 );
+
+CREATE INDEX "show.id"
+  ON show
+  USING btree
+  (id);
+
+CREATE INDEX "person.id"
+  ON person
+  USING btree
+  (id);
+
+CREATE INDEX "rating.id"
+  ON rating
+  USING btree
+  (id);
