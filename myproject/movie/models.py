@@ -30,7 +30,7 @@ class Show(models.Model):
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=250)
     duration = models.DurationField(default=timedelta())
-    release_date = models.DateField()
+    release_date = models.DateField(default='2000-01-01')
     avg_rating = models.DecimalField(decimal_places=2, max_digits=4)
     imdb_rating = models.DecimalField(decimal_places=2, max_digits=4)
     #imdb_id = models.CharField(max_length=250)
