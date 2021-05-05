@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('movie.urls')),
+    path('', include('recommender.urls')),
 ]
 
 if settings.DEBUG:
