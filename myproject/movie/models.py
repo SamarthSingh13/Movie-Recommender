@@ -88,7 +88,7 @@ class Rating(StructuredNode):
 class UserProfile(DjangoNode):
     # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
     person_id = RelationshipTo(Person, "PERSON", cardinality=One)
-    user_id = StringProperty(max_length=250, unique=True)
+    username = StringProperty(max_length=250, unique=True)
     email = EmailProperty()
     password = StringProperty(max_length=250)
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)

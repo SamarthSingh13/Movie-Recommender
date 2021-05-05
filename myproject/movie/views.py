@@ -157,12 +157,11 @@ def signUp(request):
 
     if form.is_valid():
         user = form.save(commit=False)
-        user_id = form.cleaned_data['user_id']
+        username = form.cleaned_data['username']
         password = form.cleaned_data['password']
-        print(type(user))
         user.set_password(password)
         user.save()
-        user = authenticate(user_id=user_id, password=password)
+        user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
