@@ -14,7 +14,6 @@ from neomodel import (
     RelationshipFrom,
     RelationshipTo,
     One,
-
 )
 
 
@@ -77,26 +76,24 @@ class Show(StructuredNode):
         return self.title + " - " + self.overview
 
 
-class User(DjangoNode):
-    # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
-    person_id = RelationshipTo(Person, "PERSON", cardinality=One)
-    user_id = StringProperty(max_length=250)
-    email = EmailProperty()
-    password = StringProperty(max_length=250)
-    nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
-    language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
-    watchlist = RelationshipTo(Show, "WATCHLIST")
-
-    class Meta:
-        app_label = 'movie'
-
-
 class Rating(StructuredNode):
     id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
     downvotes = IntegerProperty()
+
+
+
+class UserProfile(DjangoNode):
+    # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
+    person_id = RelationshipTo(Person, "PERSON", cardinality=One)
+    user_id = StringProperty(max_length=250, unique=True)
+    email = EmailProperty()
+    password = StringProperty(max_length=250)
+    nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
+    language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
+    watchlist = RelationshipTo(Show, "WATCHLIST")
 
 
 

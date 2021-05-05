@@ -32,7 +32,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:test@localhost:7687')
+NEOMODEL_NEO4J_BOLT_URL = os.environ.get('NEO4J_BOLT_URL', 'bolt://neo4j:neo4jgdb@localhost:7687')
 
 INSTALLED_APPS = [
     'django_neomodel',
@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'myproject.wsgi.application'
 
 
 #Connect to Neo4j Database
-config.DATABASE_URL = 'bolt://neo4j:neo4j@localhost:7687'
+# config.DATABASE_URL = 'bolt://neo4j:neo4jgdb@localhost:7687'
 
 
 

@@ -7,8 +7,7 @@
   {% load static %}
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
-  <link rel="stylesheet" type="text/css" media="screen" href='{%static "css/netflix.css" %}' />
-  <script src="main.js"></script>
+  <link rel="stylesheet" type="text/css" media="screen" href='{%static "css/style.css" %}' />
   <style type="text/css">
     element.style{
         background-color:#072d4e;
@@ -74,7 +73,7 @@
         <a href="{% url 'recently_added' %}">Recently Added</a>
       </nav>
         <nav class="sub-nav">
-      
+
         <a href="{% url 'login' %}">Log In</a>
         <a href="{% url 'signup' %}">Sign Up</a>
       </nav>
@@ -96,12 +95,12 @@
     <!-- END OF HEADER -->
 
     <!-- MAIN CONTAINER -->
-    
+
 <section class="main-container" >
-            
+
         {% block body %}
         {% endblock %}
-        
+
 </section>
   </div>
 </body>

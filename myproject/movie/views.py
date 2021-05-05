@@ -3,8 +3,8 @@ from django.contrib.auth import logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import *
 from django.http import Http404
-from .models import Ott, Genre, Language, Country, Show
-from .models import Rating, Person, User #Mru
+from .models import Ott, Genre, Language, Country, Show, UserProfile
+from .models import Rating, Person #Mru
 from django.db.models import Q
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -13,13 +13,13 @@ import pandas as pd
 
 # Create your views here.
 def index(request):
-    shows = Show.objects.all()
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(Q(title__icontains=query)).distinct()
+        shows = Show.nodes.filter(title__icontains=query).distinct()
         return render(request, 'search.html', {'shows': shows})
 
+    shows = Show.nodes.all()
     return render(request, 'home.html', {'shows': shows})
 
 # Show the search result
@@ -28,7 +28,7 @@ def search(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(Q(title__icontains=query)).distinct()
+        shows = Show.objects.filter(title__icontains=query).distinct()
         return render(request, 'search.html', {'shows': shows})
 
     return render(request, 'home.html', {'shows': shows})
@@ -97,36 +97,39 @@ def detail(request, movie_id):
 # TV shows/ Shows functionality
 def tv_shows(request):
 
-    shows = Show.objects.all()
+
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(Q(title__icontains=query)).distinct()
+        shows = Show.nodes.filter(title__icontains=query).distinct()
         return render(request, 'search.html', {'shows': shows})
 
+    shows = Show.nodes.all()
     return render(request, 'mtv.html', {'shows': shows})
 
 def movies(request):
 
-    shows = Show.objects.all()
+
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(Q(title__icontains=query)).distinct()
+        shows = Show.nodes.filter(title__icontains=query).distinct()
         return render(request, 'search.html', {'shows': shows})
 
+    shows = Show.nodes.all()
     return render(request, 'mtv.html', {'shows': shows})
 
 # recently added functionality
 def recently_added(request):
 
-    shows = Show.objects.all()
+
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(Q(title__icontains=query)).distinct()
+        shows = Show.nodes.filter(title__icontains=query).distinct()
         return render(request, 'search.html', {'shows': shows})
 
+    shows = Show.nodes.all()
     return render(request, 'recently_added.html', {'shows': shows})
 
 # MyList functionality
@@ -137,13 +140,14 @@ def mylist(request):
     if not request.user.is_active:
         raise Http404
 
-    movies = Show.objects.filter(mylist__watch=True,mylist__user=request.user)
+
     query = request.GET.get('q')
 
     if query:
-        movies = Show.objects.filter(Q(title__icontains=query)).distinct()
+        movies = Show.nodes.filter(title__icontains=query).distinct()
         return render(request, 'mylist.html', {'movies': movies})
 
+    movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
     return render(request, 'mylist.html', {'movies': movies})
 
 
@@ -155,6 +159,7 @@ def signUp(request):
         user = form.save(commit=False)
         user_id = form.cleaned_data['user_id']
         password = form.cleaned_data['password']
+        print(type(user))
         user.set_password(password)
         user.save()
         user = authenticate(user_id=user_id, password=password)
