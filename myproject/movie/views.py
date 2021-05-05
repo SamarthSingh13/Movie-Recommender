@@ -3,8 +3,8 @@ from django.contrib.auth import logout
 from django.shortcuts import render, get_object_or_404, redirect
 from .forms import *
 from django.http import Http404
-from .models import Ott, Genre, Language, Country, Show, OriginCountry, OriginalLanguage, Genre_of
-from .models import Available, Rating, Person, User, Director, Actor, LangPreference, WatchList, Mru
+from .models import Ott, Genre, Language, Country, Show
+from .models import Rating, Person, User #Mru
 from django.db.models import Q
 from django.contrib import messages
 from django.http import HttpResponseRedirect
@@ -35,12 +35,12 @@ def search(request):
 
 # Show details of the movie
 def detail(request, movie_id):
-    
+
     if not request.user.is_active:
         raise Http404
     movies = get_object_or_404(Show, id=movie_id)
     movie = Show.objects.get(id=movie_id)
-    
+
     temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
     if temp:
         update = temp[0]['watch']
@@ -65,7 +65,7 @@ def detail(request, movie_id):
             else:
                 messages.success(request, "Show removed from your list!")
 
-            
+
         # For rating
         else:
             rate = request.POST['rating']
