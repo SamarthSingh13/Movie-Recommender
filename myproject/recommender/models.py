@@ -1,11 +1,7 @@
-from django_neomodel import DjangoNode
 from neomodel import (
     StringProperty,
-    IntegerProperty,
-    FloatProperty,
-    BooleanProperty,
     StructuredNode,
-    EmailProperty,
+    DjangoNode,
     RelationshipTo,
     RelationshipFrom,
     Relationship,
@@ -14,19 +10,8 @@ from neomodel import (
     RelationshipFrom,
     RelationshipTo,
     One,
+
 )
-
-
-class Person(StructuredNode):
-    id = UniqueIdProperty()
-    name = StringProperty(max_length=250)
-    dob = DateProperty()
-    gender = StringProperty(max_length=10)
-
-    def __str__(self):
-        return self.name
-
-
 class Ott(StructuredNode):
     name = StringProperty(max_length=250)
 
@@ -55,7 +40,7 @@ class Show(StructuredNode):
     id                          = UniqueIdProperty()
     title                       = StringProperty(max_length=250)
     duration                    = IntegerProperty()
-    release_date                = DateProperty(default='2000-01-01')
+    release_year                = IntegerProperty()
     avg_rating                  = FloatProperty()
     imdb_rating                 = FloatProperty()
     #imdb_id = CharField(max_length=250)
@@ -76,31 +61,9 @@ class Show(StructuredNode):
         return self.title + " - " + self.overview
 
 
-class Rating(StructuredNode):
-    id = UniqueIdProperty()
-    numeric = FloatProperty()
-    review = StringProperty(max_length=1000)
-    upvotes = IntegerProperty()
-    downvotes = IntegerProperty()
-
-
-
-class UserProfile(DjangoNode):
-    # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
-    person_id = RelationshipTo(Person, "PERSON", cardinality=One)
-    username = StringProperty(max_length=250, unique=True)
-    email = EmailProperty()
-    password = StringProperty(max_length=250)
-    nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
-    language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
-    watchlist = RelationshipTo(Show, "WATCHLIST")
-
-
-
 # class OriginCountry(StructuredNode):
 #     show_id = models.ForeignKey(Show, on_delete=models.CASCADE)
 #     country_id = models.ForeignKey(Country, on_delete=models.CASCADE)
-
 
 
 # class OriginalLanguage(StructuredNode):
@@ -117,7 +80,32 @@ class UserProfile(DjangoNode):
 #     # episode_id = models.ForeignKey(Episode, on_delete = models.CASCADE)
 #     ott_id = models.ForeignKey(Ott, on_delete = models.CASCADE)
 
+class Rating(StructuredNode):
+    id = UniqueIdProperty()
+    numeric = models.DecimalField(decimal_places=2, max_digits=4)
+    review = StringProperty(max_length=1000)
+    upvotes = models.IntegerField()
+    downvotes = models.IntegerField()
 
+
+class Person(StructuredNode):
+    id = UniqueIdProperty()
+    name = StringProperty(max_length=250)
+    dob = DateProperty()
+    gender = StringProperty(max_length=10)
+
+    def __str__(self):
+        return self.name
+
+class User(StructuredNode):
+    # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
+    person_id = RelationshipTo(Person, cardinality=One)
+    user_id = StringProperty(max_length=250)
+    email = EmailProperty()
+    password = StringProperty(max_length=250)
+    nationality = RelationshipTo(Country, cardinality=One)
+    language_preference = RelationshipTo(Language)
+    watchlist = RelationshipTo(Show)
 
 # class LangPreference(StructuredNode):
 #     person_id = RelationshipTo(Person, cardinality=)
@@ -132,7 +120,7 @@ class UserProfile(DjangoNode):
 # class Mru(StructuredNode):
 #     show_id = models.ForeignKey(Show, on_delete = models.CASCADE)
 #     # episode_id = models.ForeignKey(Episode, on_delete = models.CASCADE)
-#     username = models.ForeignKey(User, on_delete = models.CASCADE)
+#     user_id = models.ForeignKey(User, on_delete = models.CASCADE)
 #     rating_id = models.ForeignKey(Rating, on_delete = models.CASCADE)
 
 

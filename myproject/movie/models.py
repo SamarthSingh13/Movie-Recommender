@@ -18,7 +18,7 @@ from neomodel import (
 
 
 class Person(StructuredNode):
-    id = UniqueIdProperty()
+    person_id = UniqueIdProperty()
     name = StringProperty(max_length=250)
     dob = DateProperty()
     gender = StringProperty(max_length=10)
@@ -52,10 +52,11 @@ class Country(StructuredNode):
         return self.name
 
 class Show(StructuredNode):
-    id                          = UniqueIdProperty()
-    title                       = StringProperty(max_length=250)
+    # show_id                          = UniqueIdProperty()
+    title                       = StringProperty(unique_index=True, required=True,max_length=250)
     duration                    = IntegerProperty()
-    release_date                = DateProperty(default='2000-01-01')
+    # release_date                = DateProperty(default='2000-01-01')
+    release_year                = IntegerProperty()
     avg_rating                  = FloatProperty()
     imdb_rating                 = FloatProperty()
     #imdb_id = CharField(max_length=250)
@@ -64,7 +65,7 @@ class Show(StructuredNode):
     overview                    = StringProperty(max_length=1000)
     overall_rating              = FloatProperty()
     is_movie                    = BooleanProperty(default=False)
-    origin_country              = RelationshipTo(Country, 'ORIGIN_COUNTRY', cardinality=One)
+    origin_country              = RelationshipTo(Country, 'ORIGIN_COUNTRY')
     origin_language             = RelationshipTo(Language, 'ORIGIN_LANGUAGE')
     genre                       = RelationshipTo(Genre, 'genre')
     available_on                = RelationshipTo(Ott, 'AVAILABLE_ON')
@@ -73,7 +74,7 @@ class Show(StructuredNode):
 
 
     def __str__(self):
-        return self.title + " - " + self.overview
+        return self.title
 
 
 class Rating(StructuredNode):
@@ -90,7 +91,7 @@ class UserProfile(DjangoNode):
     person_id = RelationshipTo(Person, "PERSON", cardinality=One)
     username = StringProperty(max_length=250, unique=True)
     email = EmailProperty()
-    password = StringProperty(max_length=250)
+    # password = StringProperty(max_length=250)
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
