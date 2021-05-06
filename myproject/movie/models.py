@@ -14,6 +14,7 @@ from neomodel import (
     RelationshipFrom,
     RelationshipTo,
     One,
+    StructuredRel,
 )
 
 
@@ -77,8 +78,8 @@ class Show(StructuredNode):
         return self.title
 
 
-class Rating(StructuredNode):
-    id = UniqueIdProperty()
+class Rating(StructuredRel):
+    # id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
@@ -95,6 +96,9 @@ class UserProfile(DjangoNode):
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
+    ratings = RelationshipTo(Show, "RATINGS", model=Rating)
+
+# https://api.themoviedb.org/3/search/movie?api_key=5ee2bfd3c10aaeb6eefd31d8242fb986&query=jaws
 
 
 
