@@ -4,7 +4,7 @@
 {% if not request.user.is_authenticated %}
     <br>
 {% else %}
-    <center style="color:#fff"><h2>Welcome {{user.user_id}}!!</h2></center>
+    <center style="color:#fff"><h2>Welcome {{user.username}}!!</h2></center>
 {% endif %}
 
 <div class="container" >
@@ -19,7 +19,7 @@
               </div>
           </div>
       </form>
-  </div> 
+  </div>
 </div>
 <div class="location" id="home">
 <div class="container" >

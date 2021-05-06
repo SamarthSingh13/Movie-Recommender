@@ -176,9 +176,9 @@ def signUp(request):
 # Login User
 def Login(request):
     if request.method == "POST":
-        user_id = request.POST['user_id']
+        username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(user_id=user_id, password=password)
+        user = authenticate(username=username, password=password)
 
         if user is not None:
             if user.is_active:
@@ -196,3 +196,8 @@ def Login(request):
 def Logout(request):
     logout(request)
     return redirect("login")
+
+# My profile
+def account(request):
+    shows = Show.nodes.all()
+    return render(request, 'home.html', {'shows': shows})

@@ -131,7 +131,7 @@ class UserProfile(DjangoNode):
 # class Mru(StructuredNode):
 #     show_id = models.ForeignKey(Show, on_delete = models.CASCADE)
 #     # episode_id = models.ForeignKey(Episode, on_delete = models.CASCADE)
-#     user_id = models.ForeignKey(User, on_delete = models.CASCADE)
+#     username = models.ForeignKey(User, on_delete = models.CASCADE)
 #     rating_id = models.ForeignKey(Rating, on_delete = models.CASCADE)
 
 
