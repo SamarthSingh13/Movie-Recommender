@@ -16,22 +16,24 @@ def index(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query).distinct()
+        shows = Show.nodes.filter(title__icontains=query)[0:10]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()
-    return render(request, 'home.html', {'shows': shows})
+    shows = Show.nodes.all()[0:10]
+    top_movies = Show.top_movies()[0:10]
+    return render(request, 'home.html', {'shows': shows, 'top_movies': top_movies})
 
 # Show the search result
 def search(request):
-    shows = Show.objects.all()
     query = request.GET.get('q')
 
     if query:
-        shows = Show.objects.filter(title__icontains=query).distinct()
+        shows = Show.nodes.filter(title__icontains=query)[0:10]
         return render(request, 'search.html', {'shows': shows})
 
-    return render(request, 'home.html', {'shows': shows})
+    shows = Show.nodes.all()[0:10]
+    top_movies = Show.top_movies()[0:10]
+    return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
 
 # Show details of the movie
 def detail(request, movie_id):
@@ -101,10 +103,10 @@ def tv_shows(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query).distinct()
+        shows = Show.nodes.filter(title__icontains=query)[0:10]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()
+    shows = Show.nodes.all()[0:10]
     return render(request, 'mtv.html', {'shows': shows})
 
 def movies(request):
@@ -113,11 +115,18 @@ def movies(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query).distinct()
+        shows = Show.nodes.filter(title__icontains=query)[0:10]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()
-    return render(request, 'mtv.html', {'shows': shows})
+    shows = Show.nodes.all()[0:10]
+    thriller_shows = Show.genre("Thriller")[0:10]
+    comedy_shows = Show.genre("Comedy")[0:10]
+    romance_shows = Show.genre("Romance")[0:10]
+    action_shows = Show.genre("Action")[0:10]
+    scifi_shows = Show.genre("Sci-Fi")[0:10]
+
+
+    return render(request, 'mtv.html', {'shows': shows,'thriller': thriller_shows, 'comedy': comedy_shows, 'romance': romance_shows, 'action': action_shows, 'scifi': scifi_shows})
 
 # recently added functionality
 def recently_added(request):
@@ -126,10 +135,10 @@ def recently_added(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query).distinct()
+        shows = Show.nodes.filter(title__icontains=query)[0:10]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()
+    shows = Show.nodes.all()[0:10]
     return render(request, 'recently_added.html', {'shows': shows})
 
 # MyList functionality
@@ -144,7 +153,7 @@ def mylist(request):
     query = request.GET.get('q')
 
     if query:
-        movies = Show.nodes.filter(title__icontains=query).distinct()
+        movies = Show.nodes.filter(title__icontains=query)
         return render(request, 'mylist.html', {'movies': movies})
 
     movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)

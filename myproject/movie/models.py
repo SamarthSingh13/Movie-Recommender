@@ -1,6 +1,7 @@
 from django_neomodel import DjangoNode
 import numpy as np
 from scipy.sparse import csr_matrix
+from neomodel import db
 
 from neomodel import (
     StringProperty,
@@ -17,7 +18,6 @@ from neomodel import (
     RelationshipFrom,
     RelationshipTo,
     One,
-    StructuredRel,
 )
 
 
@@ -58,6 +58,7 @@ class Country(StructuredNode):
 class Show(StructuredNode):
     # show_id                          = UniqueIdProperty()
     title                       = StringProperty(unique_index=True, required=True,max_length=250)
+    show_logo                   = StringProperty()
     duration                    = IntegerProperty()
     # release_date                = DateProperty(default='2000-01-01')
     release_year                = IntegerProperty()
@@ -76,13 +77,24 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
+    def genre(g):
+        show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a')
+        return [Show.inflate(row[0]) for row in show_list]
+
+    def top_movies():
+        top_list, meta = db.cypher_query('MATCH (a:Show)  RETURN a ORDER BY COALESCE(a.imdb_rating,0) DESC')
+        print(top_list[0:10])
+        # for t in top_list[0:10]:
+        #     print(t[0].imdb_rating)
+        return [Show.inflate(row[0]) for row in top_list]
+
 
     def __str__(self):
         return self.title
 
 
-class Rating(StructuredRel):
-    # id = UniqueIdProperty()
+class Rating(StructuredNode):
+    id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
@@ -93,7 +105,7 @@ class Rating(StructuredRel):
 class UserProfile(DjangoNode):
     # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
     person_id = RelationshipTo(Person, "PERSON", cardinality=One)
-    username = StringProperty(max_length=250, unique=True)
+    username = StringProperty(max_length=250, unique_index=True, required=True)
     email = EmailProperty()
     # password = StringProperty(max_length=250)
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
