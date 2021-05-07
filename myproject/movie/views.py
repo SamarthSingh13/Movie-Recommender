@@ -9,6 +9,10 @@ from django.db.models import Q
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.db.models import Case, When
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.shortcuts import render, redirect
 import pandas as pd
 from .tmdbapi import get_img_url
 num_movies = 20
@@ -83,32 +87,6 @@ def detail(request, movie_id):
 
 
         # For my list
-        if 'watch' in request.POST:
-            watch_flag = request.POST['watch']
-            if watch_flag == 'on':
-                update = True
-            else:
-                update = False
-            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
-                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
-            else:
-                q=MyList(user=request.user,movie=movie,watch=update)
-                q.save()
-            if update:
-                messages.success(request, "Show added to your list!")
-            else:
-                messages.success(request, "Show removed from your list!")
-
-    # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
-    # if temp:
-    #     update = temp[0]['watch']
-    # else:
-    #     update = False
-    update = False
-
-    if request.method == "POST":
-
-        # For my list
         # if 'watch' in request.POST:
         #     watch_flag = request.POST['watch']
         #     if watch_flag == 'on':
@@ -124,32 +102,62 @@ def detail(request, movie_id):
         #         messages.success(request, "Show added to your list!")
         #     else:
         #         messages.success(request, "Show removed from your list!")
-        #
+
+    # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
+    # if temp:
+    #     update = temp[0]['watch']
+    # else:
+    #     update = False
+    update = False
+
+    if request.method == "POST":
+
+        # For my list
+        if 'watch' in request.POST:
+            watch_flag = request.POST['watch']
+            if watch_flag == 'on':
+                update = True
+            else:
+                update = False
+            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            else:
+                q=MyList(user=request.user,movie=movie,watch=update)
+                q.save()
+            if update:
+                messages.success(request, "Show added to your list!")
+            else:
+                messages.success(request, "Show removed from your list!")
+        
         #
         # # For rating
         # else:
         for k in request.POST:
             print(k, request.POST[k])
-        rate = int(request.POST['rating'])
-        if request.user.is_authenticated:
-            user = request.user
+        rate = int(float(request.POST['rating']))
+        user = request.user
+        if user.is_authenticated:
             user = UserProfile.nodes.get(username=user.username)
         else:
             return Http401
         if user.ratings.is_connected(movie):
             r = user.ratings.relationship(movie)
             movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate-r.numeric)/movie.num_votes
+            movie.save()
             r.numeric = rate
+            r.review = request.POST['review']
+            r.save()
+            user.save()
         else:
-            r = user.ratings.connect(movie, {'numeric': rate})
+            r = user.ratings.connect(movie, {'numeric': rate, 'review': request.POST['review'] })
+            movie.num_votes += 1
             if movie.overall_rating is None:
-                movie.num_votes += 1
                 movie.overall_rating = rate
             else:
-                movie.num_votes += 1
                 movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate)/movie.num_votes
+            movie.save()
+            r.save()
         movie.save()
-        r.save()
         user.save()
         # if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
         #     Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
@@ -162,6 +170,7 @@ def detail(request, movie_id):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     rate_flag = False
     movie_rating = 0
+    movie_review = ''
     if request.user.is_authenticated:
         user = UserProfile.nodes.get(username=request.user.username)
         rate_flag = user.ratings.is_connected(movie)
@@ -169,6 +178,7 @@ def detail(request, movie_id):
 
         if rate_flag:
             movie_rating = user.ratings.relationship(movie).numeric
+            movie_review = user.ratings.relationship(movie).review
     # out = list(Myrating.objects.filter(user=request.user.id).values())
     #
     # # To display ratings in the movie detail page
@@ -179,8 +189,9 @@ def detail(request, movie_id):
     #         movie_rating = each['rating']
     #         rate_flag = True
     #         break
-
-    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update,
+    # print(movie_review)
+    print(movie.reviews())
+    context = {'movies': movie,'movie_rating':movie_rating,'movie_review':movie_review,'rate_flag':rate_flag,'update':update,
                'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
                'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country(),
                'all_reviews': movie.reviews()}
@@ -340,4 +351,41 @@ def Logout(request):
 
 # My profile
 def account(request):
-    return Http404
+    user = UserProfile.nodes.get(username=request.user.username)
+    pass
+    # context = {'username':,'email':}
+    # return render(request, 'signup.html', context)
+    
+# Edit Profile
+# def edit_profile(request):
+#     args = {}
+
+#     if request.method == 'POST':
+#         form = UpdateProfile(request.POST,instance=request.user)
+#         form.actual_user = request.user
+#         if form.is_valid():
+#             form.save()
+#             return HttpResponseRedirect(reverse('edit_profile_success'))
+#     else:
+#         form = UpdateProfile()
+
+#     args['form'] = form
+#     return render(request, 'edit_profile.html', args)
+    
+
+# Change Password
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_psw.html', {
+        'form': form
+    })
