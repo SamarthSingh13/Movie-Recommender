@@ -146,10 +146,11 @@ class Rating(StructuredRel):
     # id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
-    upvotes = IntegerProperty()
-    downvotes = IntegerProperty()
+    upvotes = IntegerProperty(default=0)
+    downvotes = IntegerProperty(default=0)
 
-
+class Vote(StructuredRel):
+    value = IntegerProperty()
 
 class UserProfile(DjangoNode):
     # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
@@ -161,6 +162,7 @@ class UserProfile(DjangoNode):
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
     ratings = RelationshipTo(Show, "RATINGS", model=Rating)
+    reviews_voted = RelationshipTo(Rating, "VOTED", model=Vote)
 
     # def get_usermovie_ratings(self):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
@@ -235,6 +237,9 @@ class UserProfile(DjangoNode):
         topn_users_ratings = np.squeeze(np.array([usermovie_ratings[i,:] for i in topn_users_indices]))
         print("topn_users_ratings")
         print(topn_users_ratings)
+
+        if all(np.array(topn_users_scores) == 0.0):
+            return list(map(lambda x: shows[x], list(range(0,k))))
 
         predicted_ratings = np.average(topn_users_ratings, axis=0, weights=topn_users_scores)
         print("len_predicted_ratings", len(predicted_ratings))
