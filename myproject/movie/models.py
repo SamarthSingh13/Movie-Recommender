@@ -78,6 +78,17 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
+    def get_by_id(show_id):
+        query = f"MATCH (a) WHERE ID(a)={show_id} RETURN a"
+        results, meta = db.cypher_query(query)
+        return Show.inflate(results[0][0]) if results[0] else None
+
+    def get_my_genre(self):
+        s = ""
+        for g in self.genre:
+            s += g.name + " | "
+        return s[:-2]
+
     def get_genre(g, offset, limit):
         show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a SKIP {offset} LIMIT {limit}')
         return [Show.inflate(row[0]) for row in show_list]

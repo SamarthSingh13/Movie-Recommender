@@ -167,7 +167,7 @@ def detail(request, movie_id):
     #         rate_flag = True
     #         break
 
-    context = {'movies': movies,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update}
+    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update, 'genre':movie.get_my_genre()}
     return render(request, 'detail.html', context)
 
 
