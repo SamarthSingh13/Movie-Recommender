@@ -78,7 +78,7 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
-    def genre(g):
+    def get_genre(g):
         show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a')
         return [Show.inflate(row[0]) for row in show_list]
 
@@ -117,6 +117,8 @@ class UserProfile(DjangoNode):
     def recommendations(self):
         mymovie_ratings, mycolumns = self.cypher("MATCH (u:User)-[r:ratings]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")
         mymovie_ratings = [self.inflate(row[0]) for row in mymovie_ratings]
+
+        
 
         #usermovie_ratings exists, othersmovie_ratings
 

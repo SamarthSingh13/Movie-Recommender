@@ -119,11 +119,11 @@ def movies(request):
         return render(request, 'search.html', {'shows': shows})
 
     shows = Show.nodes.all()[0:10]
-    thriller_shows = Show.genre("Thriller")[0:10]
-    comedy_shows = Show.genre("Comedy")[0:10]
-    romance_shows = Show.genre("Romance")[0:10]
-    action_shows = Show.genre("Action")[0:10]
-    scifi_shows = Show.genre("Sci-Fi")[0:10]
+    thriller_shows = Show.get_genre("Thriller")[0:10]
+    comedy_shows = Show.get_genre("Comedy")[0:10]
+    romance_shows = Show.get_genre("Romance")[0:10]
+    action_shows = Show.get_genre("Action")[0:10]
+    scifi_shows = Show.get_genre("Sci-Fi")[0:10]
 
 
     return render(request, 'mtv.html', {'shows': shows,'thriller': thriller_shows, 'comedy': comedy_shows, 'romance': romance_shows, 'action': action_shows, 'scifi': scifi_shows})
