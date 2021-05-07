@@ -24,9 +24,10 @@
 <div class="location" id="home">
 <div class="container" >
 <!-- Trending list -->
-<h1> Trending Now</h1>
-<div class="row" >
+
   {% if trending_shows %}
+  <h1> Trending Now</h1>
+  <div class="row" >
   {% for show in trending_shows %}
       <div class="col-sm-2 col-md-2">
           <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
@@ -37,8 +38,9 @@
           </div>
       </div>
       {% endfor %}
+    </div>
       {% endif %}
-</div>
+
 
 {% if request.user.is_authenticated %}
 

@@ -11,6 +11,8 @@ from django.http import HttpResponseRedirect
 from django.db.models import Case, When
 import pandas as pd
 
+num_movies = 20
+num_users = 10
 # Create your views here.
 def index(request):
     query = request.GET.get('q')
@@ -21,7 +23,13 @@ def index(request):
 
     shows = Show.nodes.all()[0:10]
     top_movies = Show.top_movies()[0:10]
-    return render(request, 'home.html', {'shows': shows, 'top_movies': top_movies})
+    if request.user.is_authenticated:
+        user = request.user
+        user = UserProfile.nodes.get(username=user.username)
+        rec_movies = user.recommendations(num_movies, num_users)
+    else:
+        rec_movies = None
+    return render(request, 'home.html', {'shows': shows, 'top_movies': top_movies, 'rec_movies':rec_movies})
 
 # Show the search result
 def search(request):

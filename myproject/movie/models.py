@@ -120,39 +120,39 @@ class UserProfile(DjangoNode):
     def recommendations(self, n, k):
         # mymovie_ratings, mycolumns = self.cypher("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")
         shows = Show.nodes.all()
-        showDict = {show:i for i, show in enumerate(shows)}
+        showDict = {show.id:i for i, show in enumerate(shows)}
 
-        # users = UserProfile.nodes.all()
-        # userDict = {user:i for i, user in enumerate(users)}
+        users = UserProfile.nodes.all()
+        userDict = {user.id:i for i, user in enumerate(users)}
 
         movie_ratings, _ = self.cypher("MATCH (u:UserProfile)-[r:RATINGS]->(s:Show) RETURN u,r,s")
         movie_ratings = [(UserProfile.inflate(row[0]), Rating.inflate(row[1]), Show.inflate(row[2])) for row in movie_ratings]
 
-        mymovie_ratings = np.zeros(len(Show.nodes))
+        mymovie_ratings = np.zeros((len(Show.nodes),))
 
         def f(r, s):
-            mymovie_ratings[showDict[s]] = r.numeric
+            mymovie_ratings[showDict[s.id]] = r.numeric
             return True
-        movie_ratings = [(u, r, s) for (u, r, s) in movie_ratings if (u.id != self.id and f(r, s))]
+        movie_ratings = [(u.id, r.numeric, s.id) for (u, r, s) in movie_ratings if (u.id != self.id and f(r, s))]
 
         # mymovie_ratings = [self.inflate(row[0]) for row in mymovie_ratings]
 
-        
+
 
         #usermovie_ratings exists, othersmovie_ratings
 
         # n = 20 # num_users
         # k = 10 # num_movies
 
-        row_list = list(map(lambda x: x[0], movie_ratings))
+        row_list = list(map(lambda x: userDict[x[0]], movie_ratings))
         val_list = list(map(lambda x: x[1], movie_ratings))
-        col_list = list(map(lambda x: x[2], movie_ratings))
+        col_list = list(map(lambda x: showDict[x[2]], movie_ratings))
 
         usermovie_ratings = csr_matrix((val_list, (row_list, col_list)), shape=(len(UserProfile.nodes), len(Show.nodes)))
         usermovie_ratings = usermovie_ratings.todense()
 
         # cosine_similarities = [np.dot(mymovie_ratings, usermovie_ratings) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings)) for usermovie_ratings in othersmovie_ratings]
-        cosine_similarities = [(i, np.dot(mymovie_ratings, usermovie_ratings[i,:]) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings[i,:]))) for i in range(len(usermovie_ratings))]
+        cosine_similarities = [(i, np.dot(usermovie_ratings[i,:], mymovie_ratings) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings[i,:]))) for i in range(len(usermovie_ratings))]
 
         cosine_similarities.sort(key = lambda x: x[1], reverse=True)
         topn_users = cosine_similarities if len(UserProfile.nodes)<n else cosine_similarities[:n]
@@ -169,7 +169,7 @@ class UserProfile(DjangoNode):
 
         topk_movies = predicted_ratings if len(Show.nodes)<k else predicted_ratings[:k]
 
-        return list(map(lambda x: x[0], topk_movies))
+        return list(map(lambda x: shows[x[0]], topk_movies))
 
 # https://api.themoviedb.org/3/search/movie?api_key=5ee2bfd3c10aaeb6eefd31d8242fb986&query=jaws
 
