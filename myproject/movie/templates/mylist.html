@@ -17,7 +17,7 @@
 </div>
 <div class="location" id="home">
 <!-- show list -->
-  <h1>My List</h1>
+  <h1>Watchlist</h1>
     <div class="row" >
             {% if shows %}
             {% for show in shows %}
@@ -26,7 +26,7 @@
 
                         <a href="{% url 'detail' show.id %}">
                             <center><h5>{{show.title}}</h5></center>
-                            <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px; height:270px; width:180px;">
+                            <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px; height:270px; width:180px;">
                         </a>
                     </div>
                 </div>
