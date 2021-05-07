@@ -89,6 +89,36 @@ class Show(StructuredNode):
             s += g.name + " | "
         return s[:-2]
 
+    def get_my_director(self):
+        s = ""
+        for d in self.director:
+            s += d.name + ", "
+        return s[:-2]
+
+    def get_my_actor(self):
+        s = ""
+        for d in self.actors:
+            s += d.name + ", "
+        return s[:-2]
+
+    def get_my_country(self):
+        s = ""
+        for c in self.origin_country:
+            s += c.name + " | "
+        return s[:-2]
+
+    def get_my_language(self):
+        s = ""
+        for l in self.origin_language:
+            s += l.name + " | "
+        return s[:-2]
+
+    def get_my_ott(self):
+        s = ""
+        for o in self.available_on:
+            s += o.name + " | "
+        return s[:-2]
+
     def get_genre(g, offset, limit):
         show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a SKIP {offset} LIMIT {limit}')
         return [Show.inflate(row[0]) for row in show_list]

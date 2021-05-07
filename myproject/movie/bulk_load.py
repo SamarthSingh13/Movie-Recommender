@@ -6,9 +6,6 @@ from neomodel import db
 
 filename = "../../kaggle_datasets/movies.csv"
 
-
-
-
 with db.transaction:
     p0 = (Ott(name='Netflix')).save()
     p1 = (Ott(name='Hulu')).save()
@@ -41,7 +38,7 @@ with db.transaction:
             if row[5] is not None:
                 row[5] = int(row[5].split("%")[0])
 
-            s = (Show(title=row[1], duration=row[15], release_year=row[2], imdb_rating=row[4], rotten_tomato = row[5])).save()
+            s = (Show(title=row[1], duration=row[15], release_year=row[2], imdb_rating=row[4], rotten_tomato = row[5], is_movie = True)).save()
             ind = ind+1
             # if ind==10:
             #     break
