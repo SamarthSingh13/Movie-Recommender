@@ -78,13 +78,13 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
-    def get_genre(g):
-        show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a')
+    def get_genre(g, offset, limit):
+        show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a SKIP {offset} LIMIT {limit}')
         return [Show.inflate(row[0]) for row in show_list]
 
-    def top_movies():
-        top_list, meta = db.cypher_query('MATCH (a:Show)  RETURN a ORDER BY COALESCE(a.imdb_rating,0) DESC')
-        print(top_list[0:10])
+    def top_movies(offset, limit):
+        top_list, meta = db.cypher_query(f'MATCH (a:Show)  RETURN a ORDER BY COALESCE(a.imdb_rating,0) DESC SKIP {offset} LIMIT {limit}')
+        # print(top_list[0:10])
         # for t in top_list[0:10]:
         #     print(t[0].imdb_rating)
         return [Show.inflate(row[0]) for row in top_list]
