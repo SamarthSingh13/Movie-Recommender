@@ -20,7 +20,7 @@ def index(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
 
     shows = Show.nodes.all()[0:num_display]
     top_movies = Show.top_movies()[0:num_display]
@@ -38,58 +38,75 @@ def search(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
 
-    shows = Show.nodes.all()[0:num_display]
-    top_movies = Show.top_movies()[0:num_display]
-    return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
+    page_no=0
+    shows = Show.nodes.filter(title__icontains=query)[page_no*num_display:(page_no+1)*num_display]
+    if page_no*num_display > num_movies:
+        shows=[]
+    return render(request, 'search.html', {'shows': shows,'page_no':page_no})
+
+def search(request,page_no):
+    query = request.GET.get('q')
+
+    if query:
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
+
+    page_no+=1
+    shows = Show.nodes.filter(title__icontains=query)[page_no*num_display:(page_no+1)*num_display]
+    if page_no*num_display > num_movies:
+        shows=[]
+    return render(request, 'search.html', {'shows': shows,'page_no':page_no})
 
 # Show details of the movie
 def detail(request, movie_id):
 
     if not request.user.is_active:
         raise Http404
-    movies = get_object_or_404(Show, id=movie_id)
-    movie = Show.objects.get(id=movie_id)
-
-    temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
-    if temp:
-        update = temp[0]['watch']
-    else:
-        update = False
+    # movies = get_object_or_none(Show, id=movie_id)
+    movie = Show.nodes.get_or_none(id=movie_id)
+    if movie is none:
+        raise Http404
+        
+    # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
+    # if temp:
+    #     update = temp[0]['watch']
+    # else:
+    #     update = False
     if request.method == "POST":
 
         # For my list
-        if 'watch' in request.POST:
-            watch_flag = request.POST['watch']
-            if watch_flag == 'on':
-                update = True
-            else:
-                update = False
-            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
-                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
-            else:
-                q=MyList(user=request.user,movie=movie,watch=update)
-                q.save()
-            if update:
-                messages.success(request, "Show added to your list!")
-            else:
-                messages.success(request, "Show removed from your list!")
+        # if 'watch' in request.POST:
+            # watch_flag = request.POST['watch']
+            # if watch_flag == 'on':
+            #     update = True
+            # else:
+            #     update = False
+            # if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+            #     MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            # else:
+            #     q=MyList(user=request.user,movie=movie,watch=update)
+            #     q.save()
+            # if update:
+            #     messages.success(request, "Show added to your list!")
+            # else:
+            #     messages.success(request, "Show removed from your list!")
 
 
         # For rating
-        else:
-            rate = request.POST['rating']
-            if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
-                Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
-            else:
-                q=Myrating(user=request.user,movie=movie,rating=rate)
-                q.save()
+        # else:
+        # rate = request.POST['rating']
+        # if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
+        #     Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
+        # else:
+        #     q=Myrating(user=request.user,movie=movie,rating=rate)
+        #     q.save()
 
-            messages.success(request, "Rating has been submitted!")
+        # messages.success(request, "Rating has been submitted!")
 
-        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    out = list(Myrating.objects.filter(user=request.user.id).values())
+        # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    # out = list(Myrating.objects.filter(user=request.user.id).values())
 
     # To display ratings in the movie detail page
     movie_rating = 0
@@ -113,7 +130,7 @@ def tv_shows(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
 
     shows = Show.nodes.all()[0:num_display]
     return render(request, 'mtv.html', {'shows': shows})
@@ -125,7 +142,7 @@ def movies(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
 
     shows = Show.nodes.all()[0:num_display]
     thriller_shows = Show.get_genre("Thriller")[0:num_display]
@@ -148,7 +165,7 @@ def recently_added(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows,'page_no':0})
 
     shows = Show.nodes.all()[0:num_display]
     return render(request, 'recently_added.html', {'shows': shows})
@@ -166,7 +183,7 @@ def mylist(request):
 
     if query:
         movies = Show.nodes.filter(title__icontains=query)
-        return render(request, 'mylist.html', {'movies': movies})
+        return render(request, 'mylist.html', {'movies': movies,'page_no':0})
 
     movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
     return render(request, 'mylist.html', {'movies': movies})
