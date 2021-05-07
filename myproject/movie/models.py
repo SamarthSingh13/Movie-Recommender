@@ -55,6 +55,7 @@ class Country(StructuredNode):
 class Show(StructuredNode):
     # show_id                          = UniqueIdProperty()
     title                       = StringProperty(unique_index=True, required=True,max_length=250)
+    show_logo                   = StringProperty()
     duration                    = IntegerProperty()
     # release_date                = DateProperty(default='2000-01-01')
     release_year                = IntegerProperty()
@@ -80,7 +81,7 @@ class Show(StructuredNode):
 
 class Rating(StructuredRel):
     # id = UniqueIdProperty()
-    numeric = FloatProperty()
+    numeric = IntegerProperty(required=True)
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
     downvotes = IntegerProperty()
@@ -90,7 +91,7 @@ class Rating(StructuredRel):
 class UserProfile(DjangoNode):
     # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
     person_id = RelationshipTo(Person, "PERSON", cardinality=One)
-    username = StringProperty(max_length=250, unique=True)
+    username = StringProperty(max_length=250, unique_index=True, required=True)
     email = EmailProperty()
     # password = StringProperty(max_length=250)
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
