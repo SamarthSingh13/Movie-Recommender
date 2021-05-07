@@ -71,7 +71,7 @@
     {% if not request.user.is_authenticated %}
     <nav class="main-nav">
         <a href="{% url 'index' %}">Home</a>
-        <a href="{% url 'tv_shows' %}">TV Shows</a>
+        <!-- <a href="{% url 'tv_shows' %}">TV Shows</a> -->
         <a href="{% url 'movies' %}">Movies</a>
         <a href="{% url 'recently_added' %}">Recently Added</a>
       </nav>
@@ -83,10 +83,10 @@
     {% else %}
     <nav class="main-nav">
         <a href="{% url 'index' %}">Home</a>
-        <a href="{% url 'tv_shows' %}">TV Shows</a>
+        <!-- <a href="{% url 'tv_shows' %}">TV Shows</a> -->
         <a href="{% url 'movies' %}">Movies</a>
         <a href="{% url 'recently_added' %}">Recently Added</a>
-        <a href="{% url 'mylist' %}">My List</a>
+        <a href="{% url 'mylist' %}">Watchlist</a>
       </nav>
       <nav class="sub-nav">
         <a href="{% url 'search' %}"><i class="fas fa-search sub-nav-logo"></i></a>

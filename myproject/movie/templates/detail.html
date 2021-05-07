@@ -39,7 +39,7 @@
             <h3><small>Origin Language: {{language}}</small></h3>
             <h3><small>Origin Country: {{country}}</small></h3>
             <h3><small>Overview: {{overview}}</small></h3>
-            
+
             {% if request.user.is_authenticated %}
             <!-- <div class="col-sm-offset-0 col-sm-8"> -->
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}"  name="ratingForm">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
             </div> </div>
-                              
+
                 </form>
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
                     {% csrf_token %}
@@ -81,13 +81,10 @@
                             <div class="row ">
                                 <div class="col-lg-14">
                                     <div class="star-rating">
-                                        <span>Add to my list  </span>
-                                        {% if update %}
-                                        <input type="checkbox" name="watch" checked>
-                                        <input type="submit" class="button" value="Remove" name="watch">
+                                        {% if in_watchlist %}
+                                        <input type="submit" class="button" value="Remove from Watchlist" name="watch">
                                         {% else %}
-                                        <input type="checkbox" name="watch">
-                                        <input type="submit" class="button" value="Add">
+                                        <input type="submit" class="button" value="Add to Watchlist" name="watch">
 
                                         {% endif %}
                                     </div>
@@ -99,9 +96,9 @@
                 </form>
 
                 {% endif %}
-                
+
                 <h3>Top Reviews</h3>
-                
+
                 <ul>
                   <li> sexy
                     <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
@@ -109,52 +106,47 @@
                       <div class="form-group">
                           <div class="input-group">
                               <div class="row ">
+                                  <input type=hidden name="{{x}}" value="value1">
                                   <div class="col-lg-14">
                                       <div class="star-rating">
-                                          <span>Upvote  </span>
-                                          {% if update %}
-                                          <input type="checkbox" name="watch" checked>
-                                          <input type="submit" class="button" value="Remove" name="watch">
+                                          {% if upvoted %}
+                                          <input type="submit" class="button" value="Upvote" name="disupvote" style="background-color: #f44336;">
                                           {% else %}
-                                          <input type="checkbox" name="watch">
-  
+                                          <input type="submit" class="button" value="Upvote" name="upvote" style="background-color: #e7e7e7; color: black;">
+
                                           {% endif %}
                                       </div>
                                   </div>
                               </div>
                           </div>
-                      </div>  
+                      </div>
                       <div class="form-group">
                         <div class="input-group">
                             <div class="row ">
                                 <div class="col-lg-14">
                                     <div class="star-rating">
-                                        <span>Downvote  </span>
-                                        {% if update %}
-                                        <input type="checkbox" name="watch" checked>
-                                        <input type="submit" class="button" value="Remove" name="watch">
+                                        {% if downvoted %}
+                                        <input type="submit" class="button" value="Downvote" name="disdownvote" style="background-color: #f44336; ">
                                         {% else %}
-                                        <input type="checkbox" name="watch">
+                                        <input type="submit" class="button" value="Downvote" name="downvote" style="background-color: #e7e7e7; color: black;">
 
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>  
+                    </div>
                   </form></li>
                   {% for review in all_reviews %}
                        <li>
-                        <p>sa</p> 
                         {%for x in review %}
-                         <p>ss</p>  
-                        {% if x.review %} 
-                          {{x.review}} 
+                        {% if x.review %}
+                          {{x.review}}
                           {%else%}
-                          {{x}}
+                          <b style="size">{{x}}</b><br />
                           {%endif%}
                         {%endfor%}
-                      </li> 
+                      </li>
                   {% endfor %}
                   </ul>
               </div>
