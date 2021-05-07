@@ -21,7 +21,7 @@ num_display = 24 # Only half are displayeed
 # Create your views here.
 
 def subset(shows):
-    return [show for show in shows if show.poster_url != ""][:num_display//2] if shows else None
+    return [show for show in shows if show.poster_url != "" and len(show.title)<=30][:num_display//2] if shows else None
 
 def index(request):
     query = request.GET.get('q')
@@ -128,7 +128,7 @@ def detail(request, movie_id):
                 messages.success(request, "Show added to your list!")
             else:
                 messages.success(request, "Show removed from your list!")
-        
+
         #
         # # For rating
         # else:
@@ -355,7 +355,7 @@ def account(request):
     pass
     # context = {'username':,'email':}
     # return render(request, 'signup.html', context)
-    
+
 # Edit Profile
 # def edit_profile(request):
 #     args = {}
@@ -371,7 +371,7 @@ def account(request):
 
 #     args['form'] = form
 #     return render(request, 'edit_profile.html', args)
-    
+
 
 # Change Password
 def change_password(request):
