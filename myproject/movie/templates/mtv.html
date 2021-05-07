@@ -17,24 +17,11 @@
 </div>
 <div class="location" id="home">
 <!-- show list -->
-  <h1>mtv</h1>
-    <div class="row" >
-            {% if shows %}
-            {% for show in shows %}
-                <div class="col-sm-2 col-md-2">
-                    <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                        <center><h5>{{show.title}}</h5></center>
-                        <a href="{% url 'detail' show.id %}">
-                            <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-                {% endif %}
-        </div>
+<p style="text-align:left;"></p>
+  <h2>Trending now</h2>
+</p><hr><br>
 
-
-  <h1>Trending now</h1>
+  
   <div class="row" >
           {% if trending_shows %}
           {% for show in trending_shows %}
@@ -50,8 +37,10 @@
               {% endif %}
       </div>
 
+      <p style="text-align:left;">
+  <h2>Thriller</h2>
+</p><hr><br>
 
-  <h1>Thriller</h1>
   <div class="row" >
           {% if thriller %}
           {% for show in thriller %}
@@ -67,8 +56,10 @@
               {% endif %}
       </div>
 
+      <p style="text-align:left;">
+  <h2>Comedy</h2>
+</p><hr><br>
 
-  <h1>Comedy</h1>
   <div class="row" >
           {% if comedy %}
           {% for show in comedy %}
@@ -84,8 +75,10 @@
               {% endif %}
       </div>
 
+      <p style="text-align:left;">
+  <h2>Romance</h2>
+</p><hr><br>
 
-  <h1>Romance</h1>
   <div class="row" >
           {% if romance %}
           {% for show in romance %}
@@ -101,8 +94,10 @@
               {% endif %}
       </div>
 
+      <p style="text-align:left;">
+  <h2>Action</h2>
+</p><hr><br>
 
-  <h1>Action</h1>
   <div class="row" >
           {% if action %}
           {% for show in action %}
@@ -118,8 +113,10 @@
               {% endif %}
       </div>
 
+      <p style="text-align:left;">
+  <h2>Sci-Fi</h2>
+</p><hr><br>
 
-  <h1>Sci-Fi</h1>
   <div class="row" >
           {% if scifi %}
           {% for show in scifi %}
