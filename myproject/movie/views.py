@@ -9,6 +9,10 @@ from django.db.models import Q
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.db.models import Case, When
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from django.shortcuts import render, redirect
 import pandas as pd
 from .tmdbapi import get_img_url
 num_movies = 20
@@ -109,22 +113,22 @@ def detail(request, movie_id):
     if request.method == "POST":
 
         # For my list
-        # if 'watch' in request.POST:
-        #     watch_flag = request.POST['watch']
-        #     if watch_flag == 'on':
-        #         update = True
-        #     else:
-        #         update = False
-        #     if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
-        #         MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
-        #     else:
-        #         q=MyList(user=request.user,movie=movie,watch=update)
-        #         q.save()
-        #     if update:
-        #         messages.success(request, "Show added to your list!")
-        #     else:
-        #         messages.success(request, "Show removed from your list!")
-        #
+        if 'watch' in request.POST:
+            watch_flag = request.POST['watch']
+            if watch_flag == 'on':
+                update = True
+            else:
+                update = False
+            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            else:
+                q=MyList(user=request.user,movie=movie,watch=update)
+                q.save()
+            if update:
+                messages.success(request, "Show added to your list!")
+            else:
+                messages.success(request, "Show removed from your list!")
+        
         #
         # # For rating
         # else:
@@ -334,4 +338,41 @@ def Logout(request):
 
 # My profile
 def account(request):
-    return Http404
+    user = UserProfile.nodes.get(username=request.user.username)
+    pass
+    # context = {'username':,'email':}
+    # return render(request, 'signup.html', context)
+    
+# Edit Profile
+# def edit_profile(request):
+#     args = {}
+
+#     if request.method == 'POST':
+#         form = UpdateProfile(request.POST,instance=request.user)
+#         form.actual_user = request.user
+#         if form.is_valid():
+#             form.save()
+#             return HttpResponseRedirect(reverse('edit_profile_success'))
+#     else:
+#         form = UpdateProfile()
+
+#     args['form'] = form
+#     return render(request, 'edit_profile.html', args)
+    
+
+# Change Password
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)  # Important!
+            messages.success(request, 'Your password was successfully updated!')
+            return redirect('change_password')
+        else:
+            messages.error(request, 'Please correct the error below.')
+    else:
+        form = PasswordChangeForm(request.user)
+    return render(request, 'change_psw.html', {
+        'form': form
+    })
