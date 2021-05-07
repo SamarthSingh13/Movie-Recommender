@@ -84,7 +84,7 @@ class Show(StructuredNode):
         return Show.inflate(results[0][0]) if results[0] else None
 
     def reviews(self):
-        results, columns = self.cypher(f"MATCH (u:UserProfile)-[r:Rating]->(b) WHERE id(b)={self.id} AND EXISTS(r.review) RETURN a, r")
+        results, columns = self.cypher(f"MATCH (u:UserProfile)-[r:Rating]->(b) WHERE id(b)={self.id} AND EXISTS(r.review) RETURN u, r")
         return [(self.inflate(row[0]).username, self.inflate(row[1])) for row in results]
 
     def get_my_genre(self):
