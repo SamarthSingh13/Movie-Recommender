@@ -95,7 +95,8 @@ def detail(request, movie_id):
     # else:
     #     update = False
     update = False
-
+    upvoted = False
+    downvoted = False
     if request.method == "POST":
         user = request.user
         if user.is_authenticated:
@@ -104,10 +105,28 @@ def detail(request, movie_id):
             return Http401
         # For my list
         if 'upvote' in request.POST:
-            
+            review_id = request.POST['review']
+            if user.reviews_voted.is_connected(Rating.get_by_id(review_id)):
+                fl = user.reviews_voted.relationship(Rating.get_by_id(review_id))
+                if fl.value == -1:
+                    fl.value = 1
+            else :
+                user.reviews_voted.connect(Rating.get_by_id(review_id),{'value':1})
+            upvoted = True
+
+        if 'downvote' in request.POST:
+            review_id = request.POST['review']
+            if user.reviews_voted.is_connected(Rating.get_by_id(review_id)):
+                fl = user.reviews_voted.relationship(Rating.get_by_id(review_id))
+                if fl.value == 1:
+                    fl.value = -1
+            else :
+                user.reviews_voted.connect(Rating.get_by_id(review_id),{'value':-1})
+            downvoted = True    
+
         if 'watch' in request.POST:
             watch_flag = request.POST['watch']
-            print(watch_flag)
+            # print(watch_flag)
             if watch_flag == 'Add to Watchlist':
                 if not user.watchlist.is_connected(movie):
                     user.watchlist.connect(movie)
@@ -178,6 +197,10 @@ def detail(request, movie_id):
                'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
                'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country(),
                'all_reviews': movie.reviews(), 'in_watchlist': in_watchlist}
+    if upvoted:
+        context['upvoted'] = upvoted
+    else:
+        context['downvoted'] = downvoted
     return render(request, 'detail.html', context)
 
 
