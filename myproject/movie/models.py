@@ -162,6 +162,7 @@ class UserProfile(DjangoNode):
     # def get_usermovie_ratings(self):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
 
+
     def recommendations(self, k, n):
         # mymovie_ratings, mycolumns = self.cypher("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")
         shows = Show.nodes.all()
