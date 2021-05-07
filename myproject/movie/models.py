@@ -158,16 +158,24 @@ class UserProfile(DjangoNode):
     # def get_usermovie_ratings(self):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
 
-    def recommendations(self, n, k):
+    def recommendations(self, k, n):
         # mymovie_ratings, mycolumns = self.cypher("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")
         shows = Show.nodes.all()
+        print("length shows", len(shows))
         showDict = {show.id:i for i, show in enumerate(shows)}
 
         users = UserProfile.nodes.all()
+        print("Users")
+        for u in users:
+            print(u)
         userDict = {user.id:i for i, user in enumerate(users)}
 
         movie_ratings, _ = self.cypher("MATCH (u:UserProfile)-[r:RATINGS]->(s:Show) RETURN u,r,s")
         movie_ratings = [(UserProfile.inflate(row[0]), Rating.inflate(row[1]), Show.inflate(row[2])) for row in movie_ratings]
+
+        print("movie_ratings")
+        for mr in movie_ratings:
+            print(mr)
 
         mymovie_ratings = np.zeros((len(Show.nodes),))
 
@@ -184,6 +192,9 @@ class UserProfile(DjangoNode):
 
         # n = 20 # num_users
         # k = 10 # num_movies
+        print("mymovie_ratings")
+        for mmr in mymovie_ratings:
+            print(mmr)
 
         row_list = list(map(lambda x: userDict[x[0]], movie_ratings))
         val_list = list(map(lambda x: x[1], movie_ratings))
@@ -191,24 +202,35 @@ class UserProfile(DjangoNode):
 
         usermovie_ratings = csr_matrix((val_list, (row_list, col_list)), shape=(len(UserProfile.nodes), len(Show.nodes)))
         usermovie_ratings = usermovie_ratings.todense()
+        print("usermovie_ratings", usermovie_ratings)
 
         # cosine_similarities = [np.dot(mymovie_ratings, usermovie_ratings) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings)) for usermovie_ratings in othersmovie_ratings]
-        cosine_similarities = [(i, np.dot(usermovie_ratings[i,:], mymovie_ratings) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings[i,:]))) for i in range(len(usermovie_ratings))]
+        cosine_similarities = [(i, np.dot(usermovie_ratings[i,:], mymovie_ratings) / (1e-10 + (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings[i,:])))) for i in range(len(usermovie_ratings))]
 
         cosine_similarities.sort(key = lambda x: x[1], reverse=True)
         topn_users = cosine_similarities if len(UserProfile.nodes)<n else cosine_similarities[:n]
 
         # np.array(usermovie_ratings)[list(map(lambda x: x[0], topn_users)) :]
         topn_users_indices = list(map(lambda x: x[0], topn_users))
-        topn_users_scores = list(map(lambda x: x[1], topn_users))
+        topn_users_scores = list(map(lambda x: x[1].item((0,0)), topn_users))
+        print("topn_users", topn_users_indices)
+        print("topn_scores", topn_users_scores)
 
-        topn_users_ratings = np.array([usermovie_ratings[i,:] for i in topn_users_indices])
+        topn_users_ratings = np.squeeze(np.array([usermovie_ratings[i,:] for i in topn_users_indices]))
+        print("topn_users_ratings")
+        print(topn_users_ratings)
+
         predicted_ratings = np.average(topn_users_ratings, axis=0, weights=topn_users_scores)
+        print("len_predicted_ratings", len(predicted_ratings))
 
         predicted_ratings = list(enumerate(predicted_ratings))
         predicted_ratings.sort(key = lambda x: x[1], reverse=True)
+        print("predicted_ratings", predicted_ratings)
 
         topk_movies = predicted_ratings if len(Show.nodes)<k else predicted_ratings[:k]
+        print("topk_movies")
+        for topkmovie in topk_movies:
+            print(topkmovie)
 
         return list(map(lambda x: shows[x[0]], topk_movies))
 
