@@ -149,6 +149,11 @@ class Rating(StructuredRel):
     upvotes = IntegerProperty(default=0)
     downvotes = IntegerProperty(default=0)
 
+    def get_by_id(rat_id):
+        query = f"MATCH (a) WHERE ID(a)={rat_id} RETURN a"
+        results, meta = db.cypher_query(query)
+        return Show.inflate(results[0][0]) if results[0] else None
+
 class Vote(StructuredRel):
     value = IntegerProperty()
 
