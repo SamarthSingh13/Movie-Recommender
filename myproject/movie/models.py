@@ -9,6 +9,7 @@ from neomodel import (
     FloatProperty,
     BooleanProperty,
     StructuredNode,
+    StructuredRel,
     EmailProperty,
     RelationshipTo,
     RelationshipFrom,
@@ -93,8 +94,8 @@ class Show(StructuredNode):
         return self.title
 
 
-class Rating(StructuredNode):
-    id = UniqueIdProperty()
+class Rating(StructuredRel):
+    # id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
