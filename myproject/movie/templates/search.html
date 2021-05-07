@@ -23,9 +23,10 @@
             {% for show in shows %}
                 <div class="col-sm-2 col-md-2">
                     <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                        <center><h5>{{show.title}}</h5></center>
+                        
                         <a href="{% url 'detail' show.id %}">
-                            <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                            <center><h5>{{show.title}}</h5></center>
+                            <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                         </a>
                     </div>
                 </div>
@@ -35,5 +36,4 @@
 
 </div>
 </div>
-
 {% endblock %}

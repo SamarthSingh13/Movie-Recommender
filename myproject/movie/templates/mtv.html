@@ -17,7 +17,7 @@
 </div>
 <div class="location" id="home">
 <!-- show list -->
-<p style="text-align:left;"></p>
+<!-- <p style="text-align:left;"></p>
   <h2>Trending now</h2>
 </p><hr><br>
 
@@ -35,7 +35,7 @@
               </div>
               {% endfor %}
               {% endif %}
-      </div>
+      </div> -->
 
       <p style="text-align:left;">
   <h2>Thriller</h2>
@@ -46,8 +46,8 @@
           {% for show in thriller %}
               <div class="col-sm-2 col-md-2">
                   <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                      <center><h5>{{show.title}}</h5></center>
-                      <a href="{% url 'detail' show.id %}">
+                    <a href="{% url 'detail' show.id %}">
+                        <center><h5>{{show.title}}</h5></center>
                           <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                       </a>
                   </div>
@@ -65,8 +65,9 @@
           {% for show in comedy %}
               <div class="col-sm-2 col-md-2">
                   <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                      <center><h5>{{show.title}}</h5></center>
+                      
                       <a href="{% url 'detail' show.id %}">
+                        <center><h5>{{show.title}}</h5></center>
                           <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                       </a>
                   </div>
@@ -84,8 +85,9 @@
           {% for show in romance %}
               <div class="col-sm-2 col-md-2">
                   <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                      <center><h5>{{show.title}}</h5></center>
+                      
                       <a href="{% url 'detail' show.id %}">
+                        <center><h5>{{show.title}}</h5></center>
                           <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                       </a>
                   </div>
@@ -103,8 +105,9 @@
           {% for show in action %}
               <div class="col-sm-2 col-md-2">
                   <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                      <center><h5>{{show.title}}</h5></center>
+                      
                       <a href="{% url 'detail' show.id %}">
+                        <center><h5>{{show.title}}</h5></center>
                           <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                       </a>
                   </div>
@@ -122,8 +125,9 @@
           {% for show in scifi %}
               <div class="col-sm-2 col-md-2">
                   <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                      <center><h5>{{show.title}}</h5></center>
+                      
                       <a href="{% url 'detail' show.id %}">
+                        <center><h5>{{show.title}}</h5></center>
                           <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                       </a>
                   </div>
