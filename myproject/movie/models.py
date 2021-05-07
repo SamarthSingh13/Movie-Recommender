@@ -166,7 +166,7 @@ class UserProfile(DjangoNode):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
 
     def get_mylist(uname,offset,limit):
-        show_list, meta = db.cypher_query(f'MATCH (a{{username:"{uname}"}})-[:watchlist]->(b) RETURN b SKIP {offset} LIMIT {limit}')
+        show_list, meta = db.cypher_query(f'MATCH (a{{username:"{uname}"}})-[:WATCHLIST]->(b) RETURN b SKIP {offset} LIMIT {limit}')
         return [Show.inflate(row[0]) for row in show_list]
 
 
