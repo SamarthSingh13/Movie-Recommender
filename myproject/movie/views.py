@@ -130,7 +130,7 @@ def detail(request, movie_id):
         # else:
         for k in request.POST:
             print(k, request.POST[k])
-        rate = int(request.POST['rating'])
+        rate = int(float(request.POST['rating']))
         if request.user.is_authenticated:
             user = request.user
             user = UserProfile.nodes.get(username=user.username)
@@ -140,8 +140,9 @@ def detail(request, movie_id):
             r = user.ratings.relationship(movie)
             movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate-r.numeric)/movie.num_votes
             r.numeric = rate
+            r.review = request.POST['review']
         else:
-            r = user.ratings.connect(movie, {'numeric': rate})
+            r = user.ratings.connect(movie, {'numeric': rate, 'review': request.POST['review'] })
             if movie.overall_rating is None:
                 movie.num_votes += 1
                 movie.overall_rating = rate
@@ -162,6 +163,7 @@ def detail(request, movie_id):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     rate_flag = False
     movie_rating = 0
+    movie_review = ''
     if request.user.is_authenticated:
         user = UserProfile.nodes.get(username=request.user.username)
         rate_flag = user.ratings.is_connected(movie)
@@ -169,6 +171,7 @@ def detail(request, movie_id):
 
         if rate_flag:
             movie_rating = user.ratings.relationship(movie).numeric
+            movie_review = user.ratings.relationship(movie).review
     # out = list(Myrating.objects.filter(user=request.user.id).values())
     #
     # # To display ratings in the movie detail page
@@ -179,8 +182,9 @@ def detail(request, movie_id):
     #         movie_rating = each['rating']
     #         rate_flag = True
     #         break
-
-    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update,
+    # print(movie_review)
+    print(movie.reviews())
+    context = {'movies': movie,'movie_rating':movie_rating,'movie_review':movie_review,'rate_flag':rate_flag,'update':update,
                'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
                'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country(),
                'all_reviews': movie.reviews()}
