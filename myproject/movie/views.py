@@ -21,7 +21,7 @@ num_display = 24 # Only half are displayeed
 # Create your views here.
 
 def subset(shows):
-    return [show for show in shows if show.poster_url != ""][:num_display//2] if shows else None
+    return [show for show in shows if show.poster_url != "" and len(show.title)<=30][:num_display//2] if shows else None
 
 def index(request):
     query = request.GET.get('q')
