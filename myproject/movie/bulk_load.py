@@ -6,9 +6,6 @@ from neomodel import db
 
 filename = "../../kaggle_datasets/movies.csv"
 
-
-
-
 with db.transaction:
     p0 = (Ott(name='Netflix')).save()
     p1 = (Ott(name='Hulu')).save()
