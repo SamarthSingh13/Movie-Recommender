@@ -74,18 +74,13 @@ def search(request):
 # Show details of the movie
 def detail(request, movie_id):
 
-    if not request.user.is_active:
+    # if not request.user.is_active:
+    #     raise Http404
+    # movie = Show.nodes.get_or_none(_id=movie_id)
+    movie = Show.get_by_id(movie_id)
+    if movie is None:
         raise Http404
 
-    movies = Show.nodes.get_or_none(id=movie_id)
-    movie = Show.objects.get(id=movie_id)
-
-    temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
-    if temp:
-        update = temp[0]['watch']
-    else:
-        update = False
-    if request.method == "POST":
 
         # For my list
         if 'watch' in request.POST:
@@ -104,31 +99,75 @@ def detail(request, movie_id):
             else:
                 messages.success(request, "Show removed from your list!")
 
+    # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
+    # if temp:
+    #     update = temp[0]['watch']
+    # else:
+    #     update = False
+    update = False
+    if request.method == "POST":
 
-        # For rating
+        # For my list
+        # if 'watch' in request.POST:
+        #     watch_flag = request.POST['watch']
+        #     if watch_flag == 'on':
+        #         update = True
+        #     else:
+        #         update = False
+        #     if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+        #         MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+        #     else:
+        #         q=MyList(user=request.user,movie=movie,watch=update)
+        #         q.save()
+        #     if update:
+        #         messages.success(request, "Show added to your list!")
+        #     else:
+        #         messages.success(request, "Show removed from your list!")
+        #
+        #
+        # # For rating
+        # else:
+        rate = request.POST['rating']
+        if request.user.is_authenticated:
+            user = request.user
+            user = UserProfile.nodes.get(username=user.username)
+        if user.ratings.is_connected(movie):
+            r = user.ratings.relationship(movie)
+            r.numeic = rate
         else:
-            rate = request.POST['rating']
-            if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
-                Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
-            else:
-                q=Myrating(user=request.user,movie=movie,rating=rate)
-                q.save()
+            r = user.ratings.connect(movie, {'numeric': rate})
+            r.save()
+            user.save()
+        # if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
+        #     Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
+        # else:
+        #     q=Myrating(user=request.user,movie=movie,rating=rate)
+        #     q.save()
 
-            messages.success(request, "Rating has been submitted!")
+        # messages.success(request, "Rating has been submitted!")
 
-            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    out = list(Myrating.objects.filter(user=request.user.id).values())
-
-    # To display ratings in the movie detail page
-    movie_rating = 0
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     rate_flag = False
-    for each in out:
-        if each['movie_id'] == movie_id:
-            movie_rating = each['rating']
-            rate_flag = True
-            break
+    movie_rating = 0
+    if request.user.is_authenticated:
+        user = UserProfile.nodes.get(username=request.user.username)
+        rate_flag = user.ratings.is_connected(movie)
 
-    context = {'movies': movies,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update}
+
+        if rate_flag:
+            movie_rating = user.ratings.relationship(movie).numeric
+    # out = list(Myrating.objects.filter(user=request.user.id).values())
+    #
+    # # To display ratings in the movie detail page
+    # movie_rating = 0
+    # rate_flag = False
+    # for each in out:
+    #     if each['movie_id'] == movie_id:
+    #         movie_rating = each['rating']
+    #         rate_flag = True
+    #         break
+
+    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update, 'genre':movie.get_my_genre()}
     return render(request, 'detail.html', context)
 
 
@@ -158,14 +197,19 @@ def movies(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-
+        if request.GET.get('search_query'):
+            shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+            header = 'Search Result'
+        else:
+            shows = Show.get_genre(query, 0, num_display)
+            header = query + ' Movies'
         for show in shows:
             if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
                 if show.poster_url != "":
                     show.save()
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': shows, 'header': header})
+
 
     shows = Show.nodes[0:num_display]
     thriller_shows = Show.get_genre("Thriller", 0, num_display)
