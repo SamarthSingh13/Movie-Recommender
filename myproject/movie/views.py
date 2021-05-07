@@ -128,7 +128,7 @@ def detail(request, movie_id):
                 messages.success(request, "Show added to your list!")
             else:
                 messages.success(request, "Show removed from your list!")
-        
+
         #
         # # For rating
         # else:
@@ -330,10 +330,13 @@ def Login(request):
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
+        print(username, password)
         user = authenticate(username=username, password=password)
 
         if user is not None:
+            print('user not None')
             if user.is_active:
+                print('user active')
                 login(request, user)
                 return redirect("index")
             else:
@@ -352,10 +355,9 @@ def Logout(request):
 # My profile
 def account(request):
     user = UserProfile.nodes.get(username=request.user.username)
-    pass
-    # context = {'username':,'email':}
-    # return render(request, 'signup.html', context)
-    
+    context = {'username':user.username,'email':user.email}
+    return render(request, 'profile.html', context)
+
 # Edit Profile
 # def edit_profile(request):
 #     args = {}
@@ -371,7 +373,7 @@ def account(request):
 
 #     args['form'] = form
 #     return render(request, 'edit_profile.html', args)
-    
+
 
 # Change Password
 def change_password(request):
