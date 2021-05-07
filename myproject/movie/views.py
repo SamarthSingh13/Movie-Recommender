@@ -20,6 +20,7 @@ def index(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+
         for show in shows:
             if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
@@ -69,6 +70,7 @@ def search(request):
                 show.save()
     return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
 
+
 # Show details of the movie
 def detail(request, movie_id):
 
@@ -80,7 +82,22 @@ def detail(request, movie_id):
         raise Http404
 
 
-    # movie = Show.objects.get(id=movie_id)
+        # For my list
+        # if 'watch' in request.POST:
+            # watch_flag = request.POST['watch']
+            # if watch_flag == 'on':
+            #     update = True
+            # else:
+            #     update = False
+            # if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+            #     MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            # else:
+            #     q=MyList(user=request.user,movie=movie,watch=update)
+            #     q.save()
+            # if update:
+            #     messages.success(request, "Show added to your list!")
+            # else:
+            #     messages.success(request, "Show removed from your list!")
 
     # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
     # if temp:
@@ -127,7 +144,7 @@ def detail(request, movie_id):
         #     q=Myrating(user=request.user,movie=movie,rating=rate)
         #     q.save()
 
-            messages.success(request, "Rating has been submitted!")
+        # messages.success(request, "Rating has been submitted!")
 
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     rate_flag = False
@@ -163,6 +180,7 @@ def tv_shows(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+
         for show in shows:
             if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
@@ -216,6 +234,7 @@ def recently_added(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+
         for show in shows:
             if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
@@ -239,6 +258,7 @@ def mylist(request):
 
     if query:
         movies = Show.nodes.filter(title__icontains=query)
+
         for show in shows:
             if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
