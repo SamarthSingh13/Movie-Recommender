@@ -1,4 +1,5 @@
 from django_neomodel import DjangoNode
+from neomodel import db
 from neomodel import (
     StringProperty,
     IntegerProperty,
@@ -14,7 +15,6 @@ from neomodel import (
     RelationshipFrom,
     RelationshipTo,
     One,
-    StructuredRel,
 )
 
 
@@ -73,13 +73,24 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
+    def genre(g):
+        show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a')
+        return [Show.inflate(row[0]) for row in show_list]
+
+    def top_movies():
+        top_list, meta = db.cypher_query('MATCH (a:Show)  RETURN a ORDER BY COALESCE(a.imdb_rating,0) DESC')
+        print(top_list[0:10])
+        # for t in top_list[0:10]:
+        #     print(t[0].imdb_rating)
+        return [Show.inflate(row[0]) for row in top_list]
+
 
     def __str__(self):
         return self.title
 
 
-class Rating(StructuredRel):
-    # id = UniqueIdProperty()
+class Rating(StructuredNode):
+    id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
     upvotes = IntegerProperty()
@@ -96,9 +107,6 @@ class UserProfile(DjangoNode):
     nationality = RelationshipTo(Country, "NATIONALITY", cardinality=One)
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
-    ratings = RelationshipTo(Show, "RATINGS", model=Rating)
-
-# https://api.themoviedb.org/3/search/movie?api_key=5ee2bfd3c10aaeb6eefd31d8242fb986&query=jaws
 
 
 
