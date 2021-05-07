@@ -10,19 +10,20 @@ from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.db.models import Case, When
 import pandas as pd
-
+from .tmdbapi import get_img_url
 num_movies = 20
 num_users = 10
+num_display = 5
 # Create your views here.
 def index(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:10]
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:10]
-    top_movies = Show.top_movies()[0:10]
+    shows = Show.nodes.all()[0:num_display]
+    top_movies = Show.top_movies()[0:num_display]
     if request.user.is_authenticated:
         user = request.user
         user = UserProfile.nodes.get(username=user.username)
@@ -36,11 +37,11 @@ def search(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:10]
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:10]
-    top_movies = Show.top_movies()[0:10]
+    shows = Show.nodes.all()[0:num_display]
+    top_movies = Show.top_movies()[0:num_display]
     return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
 
 # Show details of the movie
@@ -111,10 +112,10 @@ def tv_shows(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:10]
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:10]
+    shows = Show.nodes.all()[0:num_display]
     return render(request, 'mtv.html', {'shows': shows})
 
 def movies(request):
@@ -123,16 +124,19 @@ def movies(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:10]
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:10]
-    thriller_shows = Show.get_genre("Thriller")[0:10]
-    comedy_shows = Show.get_genre("Comedy")[0:10]
-    romance_shows = Show.get_genre("Romance")[0:10]
-    action_shows = Show.get_genre("Action")[0:10]
-    scifi_shows = Show.get_genre("Sci-Fi")[0:10]
-
+    shows = Show.nodes.all()[0:num_display]
+    thriller_shows = Show.get_genre("Thriller")[0:num_display]
+    comedy_shows = Show.get_genre("Comedy")[0:num_display]
+    romance_shows = Show.get_genre("Romance")[0:num_display]
+    action_shows = Show.get_genre("Action")[0:num_display]
+    scifi_shows = Show.get_genre("Sci-Fi")[0:num_display]
+    for show_set in [shows, thriller_shows, comedy_shows, romance_shows, action_shows, scifi_shows]:
+        for show in show_set:
+            if show.poster_url is None:
+                show.poster_url = get_img_url(show.title)
 
     return render(request, 'mtv.html', {'shows': shows,'thriller': thriller_shows, 'comedy': comedy_shows, 'romance': romance_shows, 'action': action_shows, 'scifi': scifi_shows})
 
@@ -143,10 +147,10 @@ def recently_added(request):
     query = request.GET.get('q')
 
     if query:
-        shows = Show.nodes.filter(title__icontains=query)[0:10]
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:10]
+    shows = Show.nodes.all()[0:num_display]
     return render(request, 'recently_added.html', {'shows': shows})
 
 # MyList functionality
