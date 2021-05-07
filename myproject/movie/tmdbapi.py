@@ -9,11 +9,12 @@ def search_movie(query):
     response = requests.get(url)
     data = response.json()
     results = data['results']
-    for res in results:
-        if query.lower() in [res["title"].lower(), res["original_title"]]:
-            return res
-
-    return None
+    return results[0]
+    # for res in results:
+    #     if query.lower() in [res["title"].lower(), res["original_title"].lower()]:
+    #         return res
+    #
+    # return None
 
 def get_base_img_url():
     global base_img_url

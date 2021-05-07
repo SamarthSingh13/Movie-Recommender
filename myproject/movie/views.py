@@ -20,16 +20,29 @@ def index(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:num_display]
-    top_movies = Show.top_movies()[0:num_display]
+    shows = Show.nodes[0:num_display]
+    top_movies = Show.top_movies(0, num_display)
     if request.user.is_authenticated:
         user = request.user
         user = UserProfile.nodes.get(username=user.username)
         rec_movies = user.recommendations(num_movies, num_users)
     else:
         rec_movies = None
+    for show_set in [shows, top_movies, rec_movies]:
+        if show_set is None:
+            continue
+        for show in show_set:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
     return render(request, 'home.html', {'shows': shows, 'top_movies': top_movies, 'rec_movies':rec_movies})
 
 # Show the search result
@@ -38,10 +51,22 @@ def search(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:num_display]
-    top_movies = Show.top_movies()[0:num_display]
+    shows = Show.nodes[0:num_display]
+    top_movies = Show.top_movies(0, num_display)
+    for show_set in [shows, top_movies]:
+        if show_set is None:
+            continue
+        for show in show_set:
+            show.poster_url = get_img_url(show.title)
+            if show.poster_url is None or show.poster_url == "":
+                show.save()
     return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
 
 # Show details of the movie
@@ -49,7 +74,7 @@ def detail(request, movie_id):
 
     if not request.user.is_active:
         raise Http404
-    movies = get_object_or_404(Show, id=movie_id)
+    movies = Show.nodes.get_or_none(id=movie_id)
     movie = Show.objects.get(id=movie_id)
 
     temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
@@ -113,9 +138,14 @@ def tv_shows(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:num_display]
+    shows = Show.nodes[0:num_display]
     return render(request, 'mtv.html', {'shows': shows})
 
 def movies(request):
@@ -125,18 +155,25 @@ def movies(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:num_display]
-    thriller_shows = Show.get_genre("Thriller")[0:num_display]
-    comedy_shows = Show.get_genre("Comedy")[0:num_display]
-    romance_shows = Show.get_genre("Romance")[0:num_display]
-    action_shows = Show.get_genre("Action")[0:num_display]
-    scifi_shows = Show.get_genre("Sci-Fi")[0:num_display]
+    shows = Show.nodes[0:num_display]
+    thriller_shows = Show.get_genre("Thriller", 0, num_display)
+    comedy_shows = Show.get_genre("Comedy", 0, num_display)
+    romance_shows = Show.get_genre("Romance", 0, num_display)
+    action_shows = Show.get_genre("Action", 0, num_display)
+    scifi_shows = Show.get_genre("Sci-Fi", 0, num_display)
     for show_set in [shows, thriller_shows, comedy_shows, romance_shows, action_shows, scifi_shows]:
         for show in show_set:
-            if show.poster_url is None:
+            if show.poster_url is None or show.poster_url == "":
                 show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
 
     return render(request, 'mtv.html', {'shows': shows,'thriller': thriller_shows, 'comedy': comedy_shows, 'romance': romance_shows, 'action': action_shows, 'scifi': scifi_shows})
 
@@ -148,9 +185,14 @@ def recently_added(request):
 
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes.all()[0:num_display]
+    shows = Show.nodes[0:num_display]
     return render(request, 'recently_added.html', {'shows': shows})
 
 # MyList functionality
@@ -166,6 +208,11 @@ def mylist(request):
 
     if query:
         movies = Show.nodes.filter(title__icontains=query)
+        for show in shows:
+            if show.poster_url is None or show.poster_url == "":
+                show.poster_url = get_img_url(show.title)
+                if show.poster_url != "":
+                    show.save()
         return render(request, 'mylist.html', {'movies': movies})
 
     movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
@@ -220,5 +267,5 @@ def Logout(request):
 
 # My profile
 def account(request):
-    shows = Show.nodes.all()
+    shows = Show.nodes[0:num_display]
     return render(request, 'home.html', {'shows': shows})
