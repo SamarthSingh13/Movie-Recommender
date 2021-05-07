@@ -88,36 +88,36 @@ def detail(request, movie_id):
     if request.method == "POST":
 
         # For my list
-        # if 'watch' in request.POST:
-            # watch_flag = request.POST['watch']
-            # if watch_flag == 'on':
-            #     update = True
-            # else:
-            #     update = False
-            # if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
-            #     MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
-            # else:
-            #     q=MyList(user=request.user,movie=movie,watch=update)
-            #     q.save()
-            # if update:
-            #     messages.success(request, "Show added to your list!")
-            # else:
-            #     messages.success(request, "Show removed from your list!")
+        if 'watch' in request.POST:
+            watch_flag = request.POST['watch']
+            if watch_flag == 'on':
+                update = True
+            else:
+                update = False
+            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            else:
+                q=MyList(user=request.user,movie=movie,watch=update)
+                q.save()
+            if update:
+                messages.success(request, "Show added to your list!")
+            else:
+                messages.success(request, "Show removed from your list!")
 
 
         # For rating
-        # else:
-        # rate = request.POST['rating']
-        # if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
-        #     Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
-        # else:
-        #     q=Myrating(user=request.user,movie=movie,rating=rate)
-        #     q.save()
+        else:
+            rate = request.POST['rating']
+            if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
+                Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
+            else:
+                q=Myrating(user=request.user,movie=movie,rating=rate)
+                q.save()
 
-        # messages.success(request, "Rating has been submitted!")
+            messages.success(request, "Rating has been submitted!")
 
-        # return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-    # out = list(Myrating.objects.filter(user=request.user.id).values())
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+    out = list(Myrating.objects.filter(user=request.user.id).values())
 
     # To display ratings in the movie detail page
     movie_rating = 0
