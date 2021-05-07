@@ -13,7 +13,7 @@ import pandas as pd
 from .tmdbapi import get_img_url
 num_movies = 20
 num_users = 10
-num_display = 20 # Only half are displayeed
+num_display = 24 # Only half are displayeed
 # Create your views here.
 
 def subset(shows):
@@ -262,6 +262,7 @@ def mylist(request):
                 show.poster_url = get_img_url(show.title)
                 show.save()
         return render(request, 'mylist.html', {'movies': movies})
+
 
     movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
     return render(request, 'mylist.html', {'movies': movies})
