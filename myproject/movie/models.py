@@ -134,6 +134,9 @@ class Show(StructuredNode):
         #     print(t[0].imdb_rating)
         return [Show.inflate(row[0]) for row in top_list]
 
+    def get_recadd(offset,limit):
+        recent_list, meta = db.cypher_query(f'MATCH (a:Show)  RETURN a ORDER BY a.release_year DESC SKIP {offset} LIMIT {limit}')
+        return [Show.inflate(row[0]) for row in recent_list]
 
     def __str__(self):
         return self.title
@@ -161,6 +164,11 @@ class UserProfile(DjangoNode):
 
     # def get_usermovie_ratings(self):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
+
+    def get_mylist(uname,offset,limit):
+        show_list, meta = db.cypher_query(f'MATCH (a{{username:"{uname}"}})-[:watchlist]->(b) RETURN b SKIP {offset} LIMIT {limit}')
+        return [Show.inflate(row[0]) for row in show_list]
+
 
     def recommendations(self, k, n):
         # mymovie_ratings, mycolumns = self.cypher("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")

@@ -254,8 +254,14 @@ def recently_added(request):
                 show.save()
         return render(request, 'search.html', {'shows': shows})
 
-    shows = Show.nodes[0:num_display]
-    return render(request, 'recently_added.html', {'shows': subset(shows)})
+    # shows = Show.nodes[0:num_display]
+    movies = Show.get_recadd(0,num_display)
+    for show in movies:
+        if show.poster_url is None:
+            show.poster_url = get_img_url(show.title)
+            show.save()
+
+    return render(request, 'recently_added.html', {'shows': subset(movies)})
 
 # MyList functionality
 def mylist(request):
@@ -277,9 +283,13 @@ def mylist(request):
                 show.save()
         return render(request, 'mylist.html', {'movies': movies})
 
-
-    movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
-    return render(request, 'mylist.html', {'movies': movies})
+    movies = UserProfile.get_mylist(request.user.username,0,num_display)
+    for show in movies:
+        if show.poster_url is None:
+            show.poster_url = get_img_url(show.title)
+            show.save()
+    # movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
+    return render(request, 'mylist.html', {'shows': subset(movies)})
 
 
 # Register user
