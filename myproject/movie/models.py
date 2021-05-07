@@ -1,4 +1,7 @@
 from django_neomodel import DjangoNode
+import numpy as np
+from scipy.sparse import csr_matrix
+
 from neomodel import (
     StringProperty,
     IntegerProperty,
@@ -97,6 +100,42 @@ class UserProfile(DjangoNode):
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
     ratings = RelationshipTo(Show, "RATINGS", model=Rating)
+
+    def recommendations(self):
+        mymovie_ratings, mycolumns = self.cypher("MATCH (u:User)-[r:ratings]->(s:Show) WHERE id(u) = {self} RETURN u,r,s")
+        mymovie_ratings = [self.inflate(row[0]) for row in mymovie_ratings]
+
+        #usermovie_ratings exists, othersmovie_ratings
+
+        n = 20 # num_users
+        k = 10 # num_movies
+
+        row_list = list(map(lambda x: x[0], othersmovie_ratings))
+        val_list = list(map(lambda x: x[1], othersmovie_ratings))
+        col_list = list(map(lambda x: x[2], othersmovie_ratings))
+
+        usermovie_ratings = csr_matrix((val_list, (row_list, col_list)), shape=(len(row_list), len(col_list)))
+        usermovie_ratings = usermovie_ratings.todense()
+
+        # cosine_similarities = [np.dot(mymovie_ratings, usermovie_ratings) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings)) for usermovie_ratings in othersmovie_ratings]
+        cosine_similarities = [(i, np.dot(mymovie_ratings, usermovie_ratings[i,:]) / (np.linalg.norm(mymovie_ratings) * np.linalg.norm(usermovie_ratings[i,:]))) for i in range(len(usermovie_ratings))]
+
+        cosine_similarities.sort(key = lambda x: x[1], reverse=True)
+        topn_users = cosine_similarities if n<20 else cosine_similarities[:n]
+
+        # np.array(usermovie_ratings)[list(map(lambda x: x[0], topn_users)) :]
+        topn_users_indices = list(map(lambda x: x[0], topn_users))
+        topn_users_scores = list(map(lambda x: x[1], topn_users))
+
+        topn_users_ratings = np.array([usermovie_ratings[i,:] for i in topn_users_indices])
+        predicted_ratings = np.average(topn_users_ratings, axis=0, weights=topn_users_scores)
+
+        predicted_ratings = list(enumerate(predicted_ratings))
+        predicted_ratings.sort(key = lambda x: x[1], reverse=True)
+
+        topk_movies = predicted_ratings if k<10 else predicted_ratings[:k]
+
+        return list(map(lambda x: x[0], topk_movies))
 
 # https://api.themoviedb.org/3/search/movie?api_key=5ee2bfd3c10aaeb6eefd31d8242fb986&query=jaws
 
