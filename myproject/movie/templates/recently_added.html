@@ -13,7 +13,7 @@
               </div>
           </div>
       </form>
-  </div> 
+  </div>
 </div>
 <div class="location" id="home">
 <!-- show list -->
@@ -23,10 +23,10 @@
             {% for show in shows %}
                 <div class="col-sm-2 col-md-2">
                     <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                        
+
                         <a href="{% url 'detail' show.id %}">
                             <center><h5>{{show.title}}</h5></center>
-                            <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                            <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                         </a>
                     </div>
                 </div>

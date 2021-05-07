@@ -13,8 +13,12 @@ import pandas as pd
 from .tmdbapi import get_img_url
 num_movies = 20
 num_users = 10
-num_display = 5
+num_display = 10 # Only half are displayeed
 # Create your views here.
+
+def subset(shows):
+    return [show for show in shows if show.poster_url != ""][:num_display//2]
+
 def index(request):
     query = request.GET.get('q')
 
@@ -22,10 +26,9 @@ def index(request):
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
 
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
         return render(request, 'search.html', {'shows': shows})
 
     shows = Show.nodes[0:num_display]
@@ -40,11 +43,10 @@ def index(request):
         if show_set is None:
             continue
         for show in show_set:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
-    return render(request, 'home.html', {'shows': shows, 'top_movies': top_movies, 'rec_movies':rec_movies})
+                show.save()
+    return render(request, 'home.html', {'shows': subset(shows), 'top_movies': subset(top_movies), 'rec_movies':subset(rec_movies)})
 
 # Show the search result
 def search(request):
@@ -53,10 +55,9 @@ def search(request):
     if query:
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
         return render(request, 'search.html', {'shows': shows})
 
     shows = Show.nodes[0:num_display]
@@ -66,9 +67,8 @@ def search(request):
             continue
         for show in show_set:
             show.poster_url = get_img_url(show.title)
-            if show.poster_url is None or show.poster_url == "":
-                show.save()
-    return render(request, 'home.html', {'shows': shows,'top_movies': top_movies})
+            show.save()
+    return render(request, 'home.html', {'shows': subset(shows),'top_movies': subset(top_movies)})
 
 
 # Show details of the movie
@@ -83,21 +83,21 @@ def detail(request, movie_id):
 
 
         # For my list
-        # if 'watch' in request.POST:
-            # watch_flag = request.POST['watch']
-            # if watch_flag == 'on':
-            #     update = True
-            # else:
-            #     update = False
-            # if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
-            #     MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
-            # else:
-            #     q=MyList(user=request.user,movie=movie,watch=update)
-            #     q.save()
-            # if update:
-            #     messages.success(request, "Show added to your list!")
-            # else:
-            #     messages.success(request, "Show removed from your list!")
+        if 'watch' in request.POST:
+            watch_flag = request.POST['watch']
+            if watch_flag == 'on':
+                update = True
+            else:
+                update = False
+            if MyList.objects.all().values().filter(movie_id=movie_id,user=request.user):
+                MyList.objects.all().values().filter(movie_id=movie_id,user=request.user).update(watch=update)
+            else:
+                q=MyList(user=request.user,movie=movie,watch=update)
+                q.save()
+            if update:
+                messages.success(request, "Show added to your list!")
+            else:
+                messages.success(request, "Show removed from your list!")
 
     # temp = list(MyList.objects.all().values().filter(movie_id=movie_id,user=request.user))
     # if temp:
@@ -167,7 +167,9 @@ def detail(request, movie_id):
     #         rate_flag = True
     #         break
 
-    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update, 'genre':movie.get_my_genre()}
+    context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update,
+               'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
+               'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country()}
     return render(request, 'detail.html', context)
 
 
@@ -182,14 +184,13 @@ def tv_shows(request):
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
 
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
         return render(request, 'search.html', {'shows': shows})
 
     shows = Show.nodes[0:num_display]
-    return render(request, 'mtv.html', {'shows': shows})
+    return render(request, 'mtv.html', {'shows': subset(shows)})
 
 def movies(request):
 
@@ -204,11 +205,10 @@ def movies(request):
             shows = Show.get_genre(query, 0, num_display)
             header = query + ' Movies'
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
-        return render(request, 'search.html', {'shows': shows, 'header': header})
+                show.save()
+        return render(request, 'search.html', {'shows': subset(shows), 'header': header})
 
 
     shows = Show.nodes[0:num_display]
@@ -219,12 +219,11 @@ def movies(request):
     scifi_shows = Show.get_genre("Sci-Fi", 0, num_display)
     for show_set in [shows, thriller_shows, comedy_shows, romance_shows, action_shows, scifi_shows]:
         for show in show_set:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
 
-    return render(request, 'mtv.html', {'shows': shows,'thriller': thriller_shows, 'comedy': comedy_shows, 'romance': romance_shows, 'action': action_shows, 'scifi': scifi_shows})
+    return render(request, 'mtv.html', {'shows': subset(shows),'thriller': subset(thriller_shows), 'comedy': subset(comedy_shows), 'romance': subset(romance_shows), 'action': subset(action_shows), 'scifi': subset(scifi_shows)})
 
 # recently added functionality
 def recently_added(request):
@@ -236,14 +235,13 @@ def recently_added(request):
         shows = Show.nodes.filter(title__icontains=query)[0:num_display]
 
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
         return render(request, 'search.html', {'shows': shows})
 
     shows = Show.nodes[0:num_display]
-    return render(request, 'recently_added.html', {'shows': shows})
+    return render(request, 'recently_added.html', {'shows': subset(shows)})
 
 # MyList functionality
 def mylist(request):
@@ -260,10 +258,9 @@ def mylist(request):
         movies = Show.nodes.filter(title__icontains=query)
 
         for show in shows:
-            if show.poster_url is None or show.poster_url == "":
+            if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
-                if show.poster_url != "":
-                    show.save()
+                show.save()
         return render(request, 'mylist.html', {'movies': movies})
 
     movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
@@ -318,5 +315,4 @@ def Logout(request):
 
 # My profile
 def account(request):
-    shows = Show.nodes[0:num_display]
-    return render(request, 'home.html', {'shows': shows})
+    return Http404

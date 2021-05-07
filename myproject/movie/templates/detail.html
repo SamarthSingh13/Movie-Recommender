@@ -11,7 +11,7 @@
         {% endfor %}
     </ul>
 {% endif %}
-
+<div class="location" id="home">
 <div class="container-fluid col-sm-offset-1">
 
     <div class="row">
@@ -19,7 +19,7 @@
         <div class="col-sm-2 col-md-3">
 <!--            <div class="panel panel-default">-->
 <!--                <div class="panel-body" style="border-radius: 22px 22px 22px 22px;">-->
-                    <a href="#">
+                    <br><br><br><br><br><a href="#">
                         <img src="{{ movies.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                     </a>
                     <h2></h2>
@@ -30,35 +30,57 @@
         <div class="col-sm-offset-1 col-sm-4 col-md-4">
             <h1 style="color:#fff">{{movies.title}}</h1>
             <h3><small>Genre: {{genre}}</small></h3>
-
+            <h3><small>Overall Rating: {{movie_rating}}</small></h3>
+            <h3><small>IMDB Rating: {{imdb}}</small>
+            <h3><small>Rotten Tomato Rating: {{tomato}}</small></h3></h3>
+            <h3><small>OTT: {{ott}}</small></h3>
+            <h3><small>Cast: {{actor}}</small></h3>
+            <h3><small>Director: {{director}}</small></h3>
+            <h3><small>Origin Language: {{lang}}</small></h3>
+            <h3><small>Origin Country: {{country}}</small></h3>  
+            <h3><small>Overview: {{overview}}</small></h3>  
+            {% if request.user.is_authenticated %}
             <div class="col-sm-offset-0 col-sm-8">
-                <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}" onsubmit="return validateForm()"  name="ratingForm">
+                <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}"  name="ratingForm">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <div class="input-group">
-                            <div class="row">
-                                <div class="col-lg-14">
-                                    <div class="star-rating">
-                                        <span>Rate Movie</span>
-                                        <span class="fa fa-star-o" data-rating="1"></span>
-                                        <span class="fa fa-star-o" data-rating="2"></span>
-                                        <span class="fa fa-star-o" data-rating="3"></span>
-                                        <span class="fa fa-star-o" data-rating="4"></span>
-                                        <span class="fa fa-star-o" data-rating="5"></span>
-
-                                        {% if rate_flag %}
-                                            <input type="hidden" name="rating" class="rating-value" value="{{movie_rating}}" >
-                                        {% else %}
-                                            <input type="hidden" name="rating" class="rating-value" value="0">
-                                        {% endif %}
-                                        {% csrf_token %}
-                                    </div>
-                                </div>
-                            </div>
+                        <label class="control-label col-sm-2" for="id_username">
+                          Rate: 
+                        </label>
+                        <div class="col-sm-10" style="color:black">
+                          {% if rate_flag %}
+                                        
+                            <input input type="number" min="0" max="10" name="rating" value="{{movie_rating}}">
                             <input type="submit" class="button" value="Submit">
+                            {% else %}
+                            <input input type="number" min="0" max="10" name="rating" value="0">
+                            <input type="submit" class="button" value="Submit">
+                                        <!-- <input type="hidden" name="rating" class="rating-value" value="{{movie_rating}}" > -->
+                            {% endif %}
                         </div>
-                    </div>
+                    </div>  
                 </form>
-
+                  <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}"  name="reviewForm">
+                      {% csrf_token %}
+                      <div class="form-group">
+                          <label class="control-label col-sm-2" for="id_username">
+                            Review: 
+                          </label>
+                          <div class="col-sm-10" style="color:black">
+                            {% if review_flag %}
+                            <textarea name="review" rows="4" cols="50" value={{movie_review}}>
+                            </textarea>  
+                            <input type="submit" class="button" value="Submit">
+                              {% else %}
+                              <!-- <input maxlength="30" name="review" value=""> -->
+                              <textarea name="review" rows="4" cols="50">
+                                </textarea>
+                              <input type="submit" class="button" value="Submit">
+                                          <!-- <input type="hidden" name="rating" class="rating-value" value="{{movie_rating}}" > -->
+                              {% endif %}
+                          </div>
+                      </div>  
+                  </form>
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
                     {% csrf_token %}
                     <div class="form-group">
@@ -83,9 +105,21 @@
                     </div>
                 </form>
 
+                {% endif %}
             </div>
         </div>
     </div>
+</div>
+{% for review in reviews %}
+      <div class="col-sm-2 col-md-2">
+          <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
+              <center><h5>{{show.title}}</h5></center>
+              <a href="{% url 'detail' show.id %}">
+                  <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+              </a>
+          </div>
+      </div>
+{% endfor %}
 </div>
 
 {% endblock %}
