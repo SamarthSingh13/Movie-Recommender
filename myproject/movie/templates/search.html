@@ -35,5 +35,13 @@
         </div>
 
 </div>
+<div class="container">
+{% if shows %}
+<a href="{% url 'search' page_no%}"><h5> Next</h5></a>
+{% endif %}
+{% if page_no  %}
+<a href="{% url 'search' page_no}"><h5> Previous</h5></a>
+{% endif %}
+</div>
 </div>
 {% endblock %}
