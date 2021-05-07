@@ -192,7 +192,7 @@ def detail(request, movie_id):
     #         rate_flag = True
     #         break
     # print(movie_review)
-    print(movie.reviews())
+    # print(movie.reviews())
     context = {'movies': movie,'movie_rating':movie_rating,'movie_review':movie_review,'rate_flag':rate_flag,'update':update,
                'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
                'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country(),
