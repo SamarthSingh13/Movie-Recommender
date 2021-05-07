@@ -20,7 +20,7 @@
 <!--            <div class="panel panel-default">-->
 <!--                <div class="panel-body" style="border-radius: 22px 22px 22px 22px;">-->
                     <a href="#">
-                        <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                        <img src="{{ movies.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                     </a>
                     <h2></h2>
 <!--                </div>-->
@@ -29,7 +29,7 @@
         <!-- Right Movie Info -->
         <div class="col-sm-offset-1 col-sm-4 col-md-4">
             <h1 style="color:#fff">{{movies.title}}</h1>
-            <h3><small>Genre: {{movies.genre}}</small></h3>
+            <h3><small>Genre: {{genre}}</small></h3>
 
             <div class="col-sm-offset-0 col-sm-8">
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}" onsubmit="return validateForm()"  name="ratingForm">
@@ -44,7 +44,7 @@
                                         <span class="fa fa-star-o" data-rating="3"></span>
                                         <span class="fa fa-star-o" data-rating="4"></span>
                                         <span class="fa fa-star-o" data-rating="5"></span>
-                                        
+
                                         {% if rate_flag %}
                                             <input type="hidden" name="rating" class="rating-value" value="{{movie_rating}}" >
                                         {% else %}
