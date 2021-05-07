@@ -22,30 +22,33 @@
   </div>
 </div>
 <div class="location" id="home">
-<div class="container" >
+<!-- <div class="container" > -->
 <!-- Trending list -->
-
+<!-- <p style="text-align:left;">
+        <h2> Trending Now</h2> 
+</p><hr><br>
   {% if trending_shows %}
-  <h1> Trending Now</h1>
   <div class="row" >
   {% for show in trending_shows %}
       <div class="col-sm-2 col-md-2">
           <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
               <center><h5>{{show.title}}</h5></center>
               <a href="{% url 'detail' show.id %}">
-                  <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                  <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
               </a>
           </div>
       </div>
       {% endfor %}
     </div>
-      {% endif %}
+      {% endif %} -->
 
 
 {% if request.user.is_authenticated %}
 
 <!-- Recommended tvshows list -->
-<h1> Recommended TV Shows</h1>
+<p style="text-align:left;">
+    <h2>Recommended TV Shows</h2> 
+</p><hr><br>
 <div class="row" >
   {% if rec_tvshows %}
   {% for show in rec_tvshows %}
@@ -53,7 +56,7 @@
           <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
               <center><h5>{{show.title}}</h5></center>
               <a href="{% url 'detail' show.id %}">
-                  <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                  <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
               </a>
           </div>
       </div>
@@ -62,7 +65,9 @@
 </div>
 
 <!-- Recommended movies list -->
-<h1> Recommended Movies</h1>
+<p style="text-align:left;">
+    <h2>Recommended Movies</h2> 
+</p><hr><br>
 <div class="row" >
   {% if rec_movies %}
   {% for show in rec_movies %}
@@ -70,7 +75,7 @@
           <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
               <center><h5>{{show.title}}</h5></center>
               <a href="{% url 'detail' show.id %}">
-                  <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                  <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
               </a>
           </div>
       </div>
@@ -83,15 +88,18 @@
 
 
 <!-- Top tvshows list -->
-<h1> Top TV Shows</h1>
+<p style="text-align:left;">
+    <h2> Top TV Shows</h2> 
+</p><hr><br>
 <div class="row" >
   {% if top_tvshows %}
   {% for show in top_tvshows %}
       <div class="col-sm-2 col-md-2">
           <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-              <center><h5>{{show.title}}</h5></center>
-              <a href="{% url 'detail' show.id %}">
-                  <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+            <a href="{% url 'detail' show.id %}"></a>  
+            <center><h5>{{show.title}}</h5></center>
+              
+                  <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
               </a>
           </div>
       </div>
@@ -100,15 +108,18 @@
 </div>
 
 <!-- Top movies list -->
-<h1> Top Movies</h1>
+<p style="text-align:left;">
+    <h2> Top Movies</h2> 
+</p><hr><br>
     <div class="row" >
             {% if top_movies %}
             {% for show in top_movies %}
                 <div class="col-sm-2 col-md-2">
                     <div class="thumbnail" style="border-radius: 22px 22px 22px 22px;">
-                        <center><h5>{{show.title}}</h5></center>
+
                         <a href="{% url 'detail' show.id %}">
-                            <img src="{{ show.show_logo.url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
+                        <center><h5>{{show.title}}</h5></center>
+                            <img src="{{ show.poster_url}}" class="img-responsive" style="border-radius: 22px 22px 22px 22px;">
                         </a>
                     </div>
                 </div>
@@ -116,7 +127,7 @@
                 {% endif %}
         </div>
 
-</div>
+<!-- </div> -->
 
 </div>
 {% endblock %}
