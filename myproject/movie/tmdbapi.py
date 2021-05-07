@@ -9,6 +9,8 @@ def search_movie(query):
     response = requests.get(url)
     data = response.json()
     results = data['results']
+    if results == []:
+        return None
     return results[0]
     # for res in results:
     #     if query.lower() in [res["title"].lower(), res["original_title"].lower()]:
