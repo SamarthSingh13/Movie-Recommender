@@ -105,6 +105,7 @@ def detail(request, movie_id):
     # else:
     #     update = False
     update = False
+
     if request.method == "POST":
 
         # For my list
@@ -127,17 +128,29 @@ def detail(request, movie_id):
         #
         # # For rating
         # else:
-        rate = request.POST['rating']
+        for k in request.POST:
+            print(k, request.POST[k])
+        rate = int(request.POST['rating'])
         if request.user.is_authenticated:
             user = request.user
             user = UserProfile.nodes.get(username=user.username)
+        else:
+            return Http401
         if user.ratings.is_connected(movie):
             r = user.ratings.relationship(movie)
-            r.numeic = rate
+            movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate-r.numeric)/movie.num_votes
+            r.numeric = rate
         else:
             r = user.ratings.connect(movie, {'numeric': rate})
-            r.save()
-            user.save()
+            if movie.overall_rating is None:
+                movie.num_votes += 1
+                movie.overall_rating = rate
+            else:
+                movie.num_votes += 1
+                movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate)/movie.num_votes
+        movie.save()
+        r.save()
+        user.save()
         # if Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user):
         #     Myrating.objects.all().values().filter(movie_id=movie_id,user=request.user).update(rating=rate)
         # else:
@@ -169,7 +182,8 @@ def detail(request, movie_id):
 
     context = {'movies': movie,'movie_rating':movie_rating,'rate_flag':rate_flag,'update':update,
                'genre':movie.get_my_genre(), 'director':movie.get_my_director(), 'actors': movie.get_my_actor(),
-               'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country()}
+               'language': movie.get_my_language(), 'ott': movie.get_my_ott(), 'country': movie.get_my_country(),
+               'all_reviews': movie.reviews()}
     return render(request, 'detail.html', context)
 
 
