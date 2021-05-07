@@ -89,6 +89,18 @@ class Show(StructuredNode):
             s += g.name + " | "
         return s[:-2]
 
+    def get_my_director(self):
+        s = ""
+        for d in self.director:
+            s += d.name + ", "
+        return s[:-2]
+
+    def get_my_actor(self):
+        s = ""
+        for d in self.actors:
+            s += d.name + ", "
+        return s[:-2]
+
     def get_my_country(self):
         s = ""
         for c in self.origin_country:
