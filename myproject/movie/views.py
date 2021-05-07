@@ -13,11 +13,11 @@ import pandas as pd
 from .tmdbapi import get_img_url
 num_movies = 20
 num_users = 10
-num_display = 10 # Only half are displayeed
+num_display = 20 # Only half are displayeed
 # Create your views here.
 
 def subset(shows):
-    return [show for show in shows if show.poster_url != ""][:num_display//2]
+    return [show for show in shows if show.poster_url != ""][:num_display//2] if shows else None
 
 def index(request):
     query = request.GET.get('q')
