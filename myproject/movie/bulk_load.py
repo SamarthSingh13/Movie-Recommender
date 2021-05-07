@@ -1,7 +1,7 @@
 from collections import defaultdict
 from django.apps import apps
 import csv
-from movie.models import Ott,Genre,Language,Country,Show,Person
+from movie.models import Ott,Genre,Language,Country,Show,Person, UserProfile
 from neomodel import db
 
 filename = "../../kaggle_datasets/movies.csv"
@@ -19,6 +19,12 @@ with db.transaction:
                 2:p2,
                 3:p3}
 
+    for person_id in range(1, 611):
+        person = Person(person_id=person_id, name=str(person_id)).save()
+        user = UserProfile(username=str(person_id), email=str(person_id)+"@recommender.com").save()
+        user.person_id.connect(person)
+        user.save()
+    print("Added users")
 
     with open(filename, 'r',encoding='utf-8') as csv_file:
 
@@ -41,13 +47,16 @@ with db.transaction:
             #     break
             if ind%1000==0:
                 print(ind)
+                # break
 
             # available
+            # print('h1')
             for i in range(4):
                 if (row[i+6]=='1'):
                     s.available_on.connect(platform[i])
             #
             # genre
+            # print('h2')
             list_g = row[12]
             if list_g is not None:
                 for genre in list_g.split(","):
@@ -57,6 +66,7 @@ with db.transaction:
                     s.genre.connect(g)
 
             # language
+            # print('h3')
             list_l = row[14]
             if list_l is not None:
                 for lang in list_l.split(","):
@@ -66,6 +76,7 @@ with db.transaction:
                     s.origin_language.connect(l)
 
             # country
+            # print('h4')
             list_c = row[13]
             if list_c is not None:
                 for country in list_c.split(","):
@@ -84,3 +95,28 @@ with db.transaction:
                         p = (Person(person_id = num,name=dir)).save()
                     s.director.connect(p)
             s.save()
+
+
+    with open("../../kaggle_datasets/ratingsmod.csv", 'r',encoding='utf-8') as csv_file:
+        csvreader = csv.reader(csv_file)
+        fields = next(csvreader)
+        totalratings = 0
+        totalratingsadded = 0
+        for row in csvreader:
+            if '' in row:
+                continue
+            userid = row[0]
+            totalratings += 1
+            user = UserProfile.nodes.get_or_none(username=userid)
+            if user is None:
+                raise Exception(f"{userid} userid not saved first")
+
+            # print(row)
+            s = Show.nodes.get_or_none(title=row[4].strip(), release_year=int(float(row[-1])))
+            if s is not None:
+                totalratingsadded += 1
+                r = user.ratings.connect(s, {'numeric': int(float(row[2]))})
+                r.save()
+                user.save()
+
+        print("Total ratings added =", totalratingsadded, "out of", totalratings)

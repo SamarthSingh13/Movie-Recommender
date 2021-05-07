@@ -78,7 +78,7 @@ class Show(StructuredNode):
     actors                      = RelationshipTo(Person, "ACTORS")
     director                    = RelationshipTo(Person, "DIRECTOR")
 
-    def genre(g):
+    def get_genre(g):
         show_list, meta = db.cypher_query(f'MATCH (a)-[:genre]->(b{{name:"{g}"}}) RETURN a')
         return [Show.inflate(row[0]) for row in show_list]
 
@@ -136,6 +136,8 @@ class UserProfile(DjangoNode):
         movie_ratings = [(u, r, s) for (u, r, s) in movie_ratings if (u.id != self.id and f(r, s))]
 
         # mymovie_ratings = [self.inflate(row[0]) for row in mymovie_ratings]
+
+        
 
         #usermovie_ratings exists, othersmovie_ratings
 
