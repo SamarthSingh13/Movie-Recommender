@@ -163,6 +163,7 @@ class UserProfile(DjangoNode):
         shows = Show.nodes.all()
         print("length shows", len(shows))
         showDict = {show.id:i for i, show in enumerate(shows)}
+        mywatch_set = set()
 
         users = UserProfile.nodes.all()
         print("Users")
@@ -181,8 +182,9 @@ class UserProfile(DjangoNode):
 
         def f(r, s):
             mymovie_ratings[showDict[s.id]] = r.numeric
-            return True
-        movie_ratings = [(u.id, r.numeric, s.id) for (u, r, s) in movie_ratings if (u.id != self.id and f(r, s))]
+            mywatch_set.add(showDict[s.id])
+            return False
+        movie_ratings = [(u.id, r.numeric, s.id) for (u, r, s) in movie_ratings if (u.id != self.id or f(r, s))]
 
         # mymovie_ratings = [self.inflate(row[0]) for row in mymovie_ratings]
 
@@ -195,6 +197,8 @@ class UserProfile(DjangoNode):
         print("mymovie_ratings")
         for mmr in mymovie_ratings:
             print(mmr)
+
+        print("my_num_rated", np.sum(mymovie_ratings != 0.0))
 
         row_list = list(map(lambda x: userDict[x[0]], movie_ratings))
         val_list = list(map(lambda x: x[1], movie_ratings))
@@ -224,6 +228,8 @@ class UserProfile(DjangoNode):
         print("len_predicted_ratings", len(predicted_ratings))
 
         predicted_ratings = list(enumerate(predicted_ratings))
+        predicted_ratings = list(filter(lambda x: x[0] not in mywatch_set, predicted_ratings))
+
         predicted_ratings.sort(key = lambda x: x[1], reverse=True)
         print("predicted_ratings", predicted_ratings)
 
