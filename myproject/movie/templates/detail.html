@@ -39,7 +39,6 @@
             <h3><small>Origin Language: {{lang}}</small></h3>
             <h3><small>Origin Country: {{country}}</small></h3>  
             <h3><small>Overview: {{overview}}</small></h3> 
-            </div> </div>
             {% if request.user.is_authenticated %}
             <!-- <div class="col-sm-offset-0 col-sm-8"> -->
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}"  name="ratingForm">
@@ -71,6 +70,7 @@
                       <input type="submit" class="button" value="Submit">
                     </div>
                 </div>
+            </div> </div>
                               
                 </form>
                 <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
@@ -98,13 +98,21 @@
                 </form>
 
                 {% endif %}
-            </div>
+                <h3>Top Reviews</h3>
+                <ul>
+                  <li> sexy<br><a href="#" style="color:white">Upvote</a> <a href="" style="color:white">Downvote</a></li>
+                  {% for review in reviews %}
+                       <li>({{all_review.username}}) {{all_reviews.review}} <br>
+                      <form class="form-horizontal" role="search" method="post" actions="{% url 'detail' movies.id %}">
+                        <div class="form-group"></div>
+                      </form></li> 
+                  {% endfor %}
+                  </ul>
+              </div>
         <!-- </div> -->
     <!-- </div> -->
 <!-- </div> -->
-{% for review in reviews %}
-      {{review}} <br>
-{% endfor %}
+
 </div>
 
 {% endblock %}
