@@ -63,7 +63,7 @@
                         Review:
                       </label>
                       <div class="col-sm-10" style="color:black">
-                        <textarea name="review" rows="4" cols="50" value="{{movie_review}}"></textarea>
+                        <textarea name="review" rows="4" cols="50" value="{{movie_review}}">{{movie_review}}</textarea>
                       </div>
                   </div>
                   <div class="form-group">
@@ -100,52 +100,47 @@
                 <h3>Top Reviews</h3>
 
                 <ul>
-                  <li> sexy
-                    <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
-                      {% csrf_token %}
-                      <div class="form-group">
-                          <div class="input-group">
-                              <div class="row ">
-                                  <input type=hidden name="{{x}}" value="value1">
-                                  <div class="col-lg-14">
-                                      <div class="star-rating">
-                                          {% if upvoted %}
-                                          <input type="submit" class="button" value="Upvote" name="disupvote" style="background-color: #f44336;">
-                                          {% else %}
-                                          <input type="submit" class="button" value="Upvote" name="upvote" style="background-color: #e7e7e7; color: black;">
-
-                                          {% endif %}
+                    
+                  {% for review in all_reviews %}
+                       <li>
+                        <p>{{review.1.review}}</p>
+                        <p style='text-align:right'>{{review.0}}</p>
+                        <form class="form-horizontal" role="search" method="post" action="{% url 'detail' movies.id %}">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="row ">
+                                        <input type=hidden name="review" value="{{x.id}}">
+                                        <div class="col-lg-14">
+                                            <div class="star-rating">
+                                                {% if upvoted %}
+                                                <input type="submit" class="button" value="Upvote:({{review.1.upvotes}})" name="disupvote" style="background-color: #f44336;">
+                                                {% else %}
+                                                <input type="submit" class="button" value="Upvote:({{review.1.upvotes}})" name="upvote" style="background-color: #e7e7e7; color: black;">
+      
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="input-group">
+                                  <div class="row ">
+                                      <div class="col-lg-14">
+                                          <div class="star-rating">
+                                              {% if downvoted %}
+                                              <input type="submit" class="button" value="Downvote:({{review.1.downvotes}})" name="disdownvote" style="background-color: #f44336; ">
+                                              {% else %}
+                                              <input type="submit" class="button" value="Downvote:({{review.1.downvotes}})" name="downvote" style="background-color: #e7e7e7; color: black;">
+      
+                                              {% endif %}
+                                          </div>
                                       </div>
                                   </div>
                               </div>
                           </div>
-                      </div>
-                      <div class="form-group">
-                        <div class="input-group">
-                            <div class="row ">
-                                <div class="col-lg-14">
-                                    <div class="star-rating">
-                                        {% if downvoted %}
-                                        <input type="submit" class="button" value="Downvote" name="disdownvote" style="background-color: #f44336; ">
-                                        {% else %}
-                                        <input type="submit" class="button" value="Downvote" name="downvote" style="background-color: #e7e7e7; color: black;">
-
-                                        {% endif %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                  </form></li>
-                  {% for review in all_reviews %}
-                       <li>
-                        {%for x in review %}
-                        {% if x.review %}
-                          {{x.review}}
-                          {%else%}
-                          <b style="size">{{x}}</b><br />
-                          {%endif%}
-                        {%endfor%}
+                        </form>
                       </li>
                   {% endfor %}
                   </ul>
