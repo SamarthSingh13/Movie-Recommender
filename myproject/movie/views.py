@@ -33,7 +33,7 @@ def index(request):
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
     shows = Show.nodes[0:num_display]
     top_movies = Show.top_movies(0, num_display)
@@ -62,7 +62,7 @@ def search(request):
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
     shows = Show.nodes[0:num_display]
     top_movies = Show.top_movies(0, num_display)
@@ -122,7 +122,7 @@ def detail(request, movie_id):
                     fl.value = -1
             else :
                 user.reviews_voted.connect(Rating.get_by_id(review_id),{'value':-1})
-            downvoted = True    
+            downvoted = True
 
         if 'watch' in request.POST:
             watch_flag = request.POST['watch']
@@ -147,15 +147,17 @@ def detail(request, movie_id):
                 movie.save()
                 r.numeric = rate
                 r.review = request.POST['review']
+                if r.review == "":
+                    r.review = None
                 r.save()
                 user.save()
             else:
-                r = user.ratings.connect(movie, {'numeric': rate, 'review': request.POST['review'] })
+                r = user.ratings.connect(movie, {'numeric': rate, 'review': request.POST['review'] if request.POST['review'] != "" else None})
                 movie.num_votes += 1
                 if movie.overall_rating is None:
                     movie.overall_rating = rate
                 else:
-                    movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate)/movie.num_votes
+                    movie.overall_rating = ((movie.overall_rating*(movie.num_votes-1))+rate)/movie.num_votes
                 movie.save()
                 r.save()
             movie.save()
@@ -218,7 +220,7 @@ def tv_shows(request):
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
     shows = Show.nodes[0:num_display]
     return render(request, 'mtv.html', {'shows': subset(shows)})
@@ -229,17 +231,19 @@ def movies(request):
     query = request.GET.get('q')
 
     if query:
-        if request.GET.get('search_query'):
-            shows = Show.nodes.filter(title__icontains=query)[0:num_display]
-            header = 'Search Result'
-        else:
-            shows = Show.get_genre(query, 0, num_display)
-            header = query + ' Movies'
+        shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+
+        # if request.GET.get('search_query'):
+        #     shows = Show.nodes.filter(title__icontains=query)[0:num_display]
+        #     header = 'Search Result'
+        # else:
+        #     shows = Show.get_genre(query, 0, num_display)
+        #     header = query + ' Movies'
         for show in shows:
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'search.html', {'shows': subset(shows), 'header': header})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
 
     shows = Show.nodes[0:num_display]
@@ -269,7 +273,7 @@ def recently_added(request):
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'search.html', {'shows': shows})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
     # shows = Show.nodes[0:num_display]
     movies = Show.get_recadd(0,num_display)
@@ -292,22 +296,22 @@ def mylist(request):
     query = request.GET.get('q')
 
     if query:
-        movies = Show.nodes.filter(title__icontains=query)
+        shows = Show.nodes.filter(title__icontains=query)
 
         for show in shows:
             if show.poster_url is None:
                 show.poster_url = get_img_url(show.title)
                 show.save()
-        return render(request, 'mylist.html', {'movies': movies})
+        return render(request, 'search.html', {'shows': subset(shows)})
 
-    movies = UserProfile.get_mylist(request.user.username,0,num_display)
-    for show in movies:
+    shows = UserProfile.get_mylist(request.user.username,0,num_display)
+    for show in shows:
         print("url:", show.poster_url)
         if show.poster_url is None:
             show.poster_url = get_img_url(show.title)
             show.save()
     # movies = Show.nodes.filter(mylist__watch=True,mylist__user=request.user)
-    return render(request, 'mylist.html', {'shows': subset(movies)})
+    return render(request, 'mylist.html', {'shows': subset(shows)})
 
 
 # Register user
