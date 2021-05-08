@@ -113,7 +113,15 @@ with db.transaction:
             if s is not None:
                 totalratingsadded += 1
                 r = user.ratings.connect(s, {'numeric': int(float(row[2]))})
-                r.save()
-                user.save()
+                movie.num_votes += 1
+                if movie.overall_rating is None:
+                    movie.overall_rating = rate
+                else:
+                    movie.overall_rating = ((movie.overall_rating*movie.num_votes)+rate)/movie.num_votes
+                movie.save()
+                # r.save()
+                # user.save()
 
         print("Total ratings added =", totalratingsadded, "out of", totalratings)
+
+    # for show in Show.nodes.all():
