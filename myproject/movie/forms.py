@@ -13,7 +13,6 @@ class UserForm(forms.ModelForm):
         labels = {'email': 'Email'}
 
     def clean(self):
-
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).exists():
             # print("Ayush sucks2")

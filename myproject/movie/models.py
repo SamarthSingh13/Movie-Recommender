@@ -146,10 +146,16 @@ class Rating(StructuredRel):
     # id = UniqueIdProperty()
     numeric = FloatProperty()
     review = StringProperty(max_length=1000)
-    upvotes = IntegerProperty()
-    downvotes = IntegerProperty()
+    upvotes = IntegerProperty(default=0)
+    downvotes = IntegerProperty(default=0)
 
+    def get_by_id(rat_id):
+        query = f"MATCH (a)-[r:RATINGS]->(b) WHERE ID(r)={rat_id} RETURN r"
+        results, meta = db.cypher_query(query)
+        return Rating.inflate(results[0][0]) if results[0] else None
 
+class Vote(StructuredRel):
+    value = IntegerProperty()
 
 class UserProfile(DjangoNode):
     # person_id = models.ForeignKey(Person, on_delete = models.CASCADE)
@@ -161,6 +167,7 @@ class UserProfile(DjangoNode):
     language_preference = RelationshipTo(Language, "LANGUAGE_PREFERENCE")
     watchlist = RelationshipTo(Show, "WATCHLIST")
     ratings = RelationshipTo(Show, "RATINGS", model=Rating)
+    reviews_voted = RelationshipTo(Rating, "VOTED", model=Vote)
 
     # def get_usermovie_ratings(self):
     #     db.cypher_query("MATCH (u:UserProfile)-[r:Rating]->(s:Show) WHERE id(u) <> {self} RETURN ")
