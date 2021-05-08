@@ -2,6 +2,7 @@ from django_neomodel import DjangoNode
 import numpy as np
 from scipy.sparse import csr_matrix
 from neomodel import db
+import random
 
 from neomodel import (
     StringProperty,
@@ -178,17 +179,17 @@ class UserProfile(DjangoNode):
         mywatch_set = set()
 
         users = UserProfile.nodes.all()
-        print("Users")
-        for u in users:
-            print(u)
+        # print("Users")
+        # for u in users:
+        #     print(u)
         userDict = {user.id:i for i, user in enumerate(users)}
 
         movie_ratings, _ = self.cypher("MATCH (u:UserProfile)-[r:RATINGS]->(s:Show) RETURN u,r,s")
         movie_ratings = [(UserProfile.inflate(row[0]), Rating.inflate(row[1]), Show.inflate(row[2])) for row in movie_ratings]
 
-        print("movie_ratings")
-        for mr in movie_ratings:
-            print(mr)
+        # print("movie_ratings")
+        # for mr in movie_ratings:
+        #     print(mr)
 
         mymovie_ratings = np.zeros((len(Show.nodes),))
 
@@ -206,9 +207,9 @@ class UserProfile(DjangoNode):
 
         # n = 20 # num_users
         # k = 10 # num_movies
-        print("mymovie_ratings")
-        for mmr in mymovie_ratings:
-            print(mmr)
+        # print("mymovie_ratings")
+        # for mmr in mymovie_ratings:
+        #     print(mmr)
 
         print("my_num_rated", np.sum(mymovie_ratings != 0.0))
 
@@ -237,7 +238,11 @@ class UserProfile(DjangoNode):
         print(topn_users_ratings)
 
         if all(np.array(topn_users_scores) == 0.0):
-            return list(map(lambda x: shows[x], list(range(0,k))))
+            x = list(range(0, len(Show.nodes)))
+            random.shuffle(x)
+            print("list of movies", list(map(lambda x: shows[x], x[:k])))
+            return list(map(lambda x: shows[x], x[:k]))
+            # return list(map(lambda x: shows[x], list(range(0,k))))
 
         predicted_ratings = np.average(topn_users_ratings, axis=0, weights=topn_users_scores)
         print("len_predicted_ratings", len(predicted_ratings))
